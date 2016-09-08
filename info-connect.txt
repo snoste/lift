@@ -1,0 +1,8 @@
+Using HTTPS (recommended)
+
+goto the directory where you want to place the "lift" directory and then:
+
+git clone https://github.com/snoste/lift.git
+
+You will have to type your user name and/or password depening on if you have already done it
+
