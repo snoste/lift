@@ -41,13 +41,10 @@
 
 \section{}
 
+\textbf{Definition:}
+Ship lift. General purpose ship lift for elevating ships to a geographically, vertical, higher location. \\
 
-If the assignment were about a bridge, typical requirements would be: ‘A bridge will never open when the barriers are not closed’; ‘If an operator instructs the bridge to open, the bridge will open unless the barriers are not closed’; and ‘A bridge will never open spontaneously’. These requirements are initially to be described in natural language. 
-
-Definition:
-Ship lift. General purpose ship lift for elevating ships to a geographically, vertical, higher location. 
-
-Requirements for the whole system:
+\textbf{Global requirements for the system:}
 \begin{enumerate}
 	\item Only one boat can be elevated at a time
 	\item The lift has to be big enough for all boats going through.
@@ -59,32 +56,42 @@ Requirements for the whole system:
 	\item Every floor should be able to decrease its water level.
 	\item The water flow can not distort the boats equilibrium.
 	\item Sensing if the ship is completely inside the lift or not.
-	\item The gates should not be able to open when the water level on both upper and lower side is not the same
+	\item The gates should not be able to open when the water level on the floor above or below is not the same.
 	
 \end{enumerate}
 
-A general requirement
-
-\begin{enumerate}
-	\item The gate should be open before the boats enters each floor
-	\item After the boat is in the lift
-\end{enumerate}
-
-1–2. 	The boat enters the lock. 	
-3. 		The lower gates are closed. 
-4–5. 	The lock is filled with water from upstream. 	
-6. 		The upper gates are opened. 	
-7. 		The boat exits the lock. 	
-8–9. 	The boat enters the lock.
-10. 	The upper gates are closed.
-11–12. 	The lock is emptied by draining its water downstream.
-13. 	The lower gates are opened.
-14. 	The boat exits the lock.
 \pagebreak
 
-Ask about:
-Operator
-Multiple floor.  More than one elevation 
+\textbf{Sequence for the boat lift}, elevating a boat up a floor.
+
+\begin{enumerate}
+	\item Doors will open of no boat is in the lift
+	\item A boat enters the first level 0 lift.
+	\item The doors in level 0 closed.
+	
+	\item Level 0 fills up with water from level 1. The boat is elevated to level 1.
+	\item Door into level 1 open when the water level is the same in both level 0 and 1.
+	\item The boat sails into level 1.
+	\item The doors in level 1 close.
+	
+	\item Level 1 fills up with water from level 2. The boat is elevated to level 1.
+	\item Door into level 2 open when the water level is the same in both level 1 and 2.
+	\item The boat sails into level 2.
+	\item The doors in level 2 close.
+	
+	\item The door out of level 2 open. The boat sails on its way. 
+\end{enumerate}
+
+Items from 4-7 and 8-11 are repetitive for indication of this being enough for proofing of a N-order system. Were this could be determined as a second order system.
+
+\pagebreak
+
+Questionable components of the project?
+\begin{itemize}
+	\item Should the be a Operator? For trying to eliminate some security flaws.
+	\item Multiple floor. Sufficient would be lifting up two times to cover all aspects? Rather N-times?  What is relevant or doable?
+\end{itemize}
 
 
 \end{document}\grid
+\grid
