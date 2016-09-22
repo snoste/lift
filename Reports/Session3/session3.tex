@@ -1,0 +1,86 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usetikzlibrary{arrows,automata}
+
+
+\begin{document}
+
+\title{\huge{Boat Lift} \\ {\fontsize{13}{1} \selectfont Global requirements for the whole system} }
+\author{Filippo Bernardi, Jasper Lustig, Jonas Wallmeier, Snorri Stefansson}
+
+\maketitle
+
+%\begin{abstract}
+
+%\end{abstract}
+
+\vspace{3cm}
+
+
+\pagebreak
+
+\section{Introduction}
+
+\section{Context Description}
+This section describes the 
+\textbf{Definition:}
+Ship lift. General purpose ship lift for elevating ships to a geographically, vertical, higher location. \\
+\subsection{General Outline}
+\begin{itemize}
+	\item no operator - fully autonomous system
+	\item only 2 two levels
+	\item two gates
+	\item two signaling systems, each facing both ways
+	\item one valve per gate
+	\item unlimited water supply on upper level
+	\item Lift is assumed to be big enough for all ships passing through
+\end{itemize}
+\pagebreak
+
+\subsection{Output}
+\begin{enumerate}
+	\item Signal light: pass or hold
+	\item Gates: open or closed
+	\item Valves: open or closed
+\end{enumerate}
+
+\subsection{Input}
+\begin{enumerate}
+	\item Actuator states
+	\begin{itemize}
+		\item Signal light: pass or hold
+		\item Gates: open or closed
+		\item Valves: open or closed
+	\end{itemize}
+	\item Waterflow through valve pipes
+	\item Location of the ship in the system
+	\begin{itemize}
+		\item completely in the lift
+		\item at the signal lights
+	\end{itemize}
+\end{enumerate}
+
+\section{Requirements}
+\begin{enumerate}
+	\item Only one gate can be open at a time
+	\item Only one valve can be open at a time
+	\item Only one ship can pass through the system at a time
+	\item A gate can only open if the water level on both sides is equal
+	\item Entering signal light:
+		\begin{enumerate}
+			\item The signal must always be on
+			\item The signal must never indicate pass and hold at the same time
+			\item The signal can only indicate pass if the gate is completely opened
+			\item The signal can only indicate pass if there is no ship in the system
+		\end{enumerate}
+	\item Leaving signal light:
+		\begin{enumerate}
+			\item The signal must always be on
+			\item The signal must never indicate pass and hold at the same time
+			\item The signal can only indicate pass if the gate is completely opened
+		\end{enumerate}
+\end{enumerate}
+
+\end{document}
+\grid
