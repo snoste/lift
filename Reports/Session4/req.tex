@@ -1,26 +1,35 @@
 \section{Requirements}
+\subsubsection{Safety}
 \begin{enumerate}
 	\item Only one gate can be open at a time
 	\item Only one valve can be open at a time
-	\item A valve and gate at different levels can never be open at the same time
-	\item After a ship has entered the sluice the gate will close
+	\item Valves and gates at different levels can never be open at the same time	
 	\item A gate can only close if there is no ship in between its doors
 	\item A gate can only open if the water level on both sides is equal
-	\item Without a ship in the system the system will remain idle
-	
+	\item Without a ship in it, the system remains idle:
+	\begin{enumerate}
+		\item All gates are closed
+		\item All signals indicate halt
+		\item The most recently opened valve remains open
+	\end{enumerate}
 	\item Entering signal light:
-		\begin{enumerate}
-			\item The signal must always be on
-			\item The signal must never indicate pass and hold at the same time
-			\item The signal can only indicate pass if the gate is completely opened
-			\item The signal can only indicate pass if there is no ship in the system
-			\item When the system is in idle state all doors must be closed.
-			
-		\end{enumerate}
+	\begin{enumerate}
+		\item The signal must always be on
+		\item The signal must never indicate pass and hold at the same time
+		\item The signal can only indicate pass if the gate is completely opened
+		\item The signal can only indicate pass if there is no ship in-between the signal lights
+	\end{enumerate}
 	\item Leaving signal light:
-		\begin{enumerate}
-			\item The signal must always be on
-			\item The signal must never indicate pass and hold at the same time
-			\item The signal can only indicate pass if the gate is completely opened
-		\end{enumerate}
+	\begin{enumerate}
+		\item The signal must always be on
+		\item The signal must never indicate pass and hold at the same time
+		\item The signal can only indicate pass if the gate is completely opened
+	\end{enumerate}
+\end{enumerate}
+	
+\subsubsection{Functionality}
+\begin{enumerate}
+	\item The system should work with a "first come - first serve" principle
+	\item When a ship is waiting at a entry signal light, the light should switch to pass as soon as possible
+	\item After a ship has entered the system, the exit signal light on the other side should switch to pass as soon as possible
 \end{enumerate}
