@@ -4,19 +4,45 @@
 	
 		\begin{itemize}
 			\item It is not possible to send open\_Gategate0 and open\_Gategate1 at the same time
+			\item Before open a gate, the system should check if the other gate is open by using requestGateState\_gateID (this ID should be the opposite of the gate that the system is opening)
 		\end{itemize}
 	
 	\item Only one valve can be open at a time
 	
 		\begin{itemize}
-			\item It is not possible to send an openValvevalveID and an ValvevalveID at the same time
+			\item It is not possible to send openValve\_valve0 and openValve\_valve1 at the same time
+			\item Before open a valve, the system should check if the other valve is open by using requestValveState\_valveID (this ID should be the opposite of the valve that the system is opening)
 		\end{itemize}
 	
 	\item A valve and gate at different levels can never be open at the same time
+		\begin{itemize}
+			\item It is forbidden to send at the same time a open\_GategateID and openValve\_valveID if the ID is different.
+		\end{itemize}
+	
 	\item After a ship has entered the sluice the gate will close
+	\begin{itemize}
+		\item The door can close by closeGate\_gateID request if 
+		
+		------we need to insert the boat position sensors------
+		
+	\end{itemize}
 	\item A gate can only close if there is no ship in between its doors
+	\begin{itemize}
+		\item If, after a requestGateSensor\_gateID it is received a receivedGateSensor\_gateID=false, then it is possible to send a closeGate\_gateID
+		
+		
+		------we need to insert sensor state-----
+		
+	\end{itemize}
+	
 	\item A gate can only open if the water level on both sides is equal
+	\begin{itemize}
+		\item Before open a gate, the system must check if the level of two container adjacent to the gate are equal: first send requestWaterlevel\_containerID to the two adjacent container and than check if the two receivedWaterlevel\_containerID value are the same. The system now can open the gate securely.
+	\end{itemize}
+	
 	\item Without a ship in the system the system will remain idle
+	
+	-----we need to insert outside sensors-----
 	
 	\item Entering signal light:
 		\begin{enumerate}
@@ -33,4 +59,10 @@
 			\item The signal must never indicate pass and hold at the same time
 			\item The signal can only indicate pass if the gate is completely opened
 		\end{enumerate}
+\end{enumerate}
+\subsubsection*{Functionality}
+\begin{enumerate}
+	\item The system should work with a "first come - first serve" principle
+	\item When a ship is waiting at a entry signal light, the light should switch to pass as soon as possible
+	\item After a ship has entered the system, the exit signal light on the other side should switch to pass as soon as possible
 \end{enumerate}
