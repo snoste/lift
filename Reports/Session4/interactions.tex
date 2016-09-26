@@ -1,0 +1,56 @@
+\section{Interactions}
+
+\subsection{Commands}
+\begin{table}[htbp]
+	\centering
+	\caption{Commands are given by the controller to the lift components and the ship operator/captain}
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
+		\midrule
+		openGate\_gateID & Open gate with the corresponding gate ID & gateID \\
+		closeGate\_gateID & Close gate with the corresponding gate ID & gateID \\
+		openValve\_valveID & Open valve with the corresponding gate ID & valveID \\
+		closeValve\_valveID & Close valve with the corresponding gate ID & valveID \\
+		setSignalPass\_signalID & Set signal to pass with the corresponding ID  & signalID \\
+		setSignalHold\_signalID & Set signal to hold with the corresponding ID  & signalID \\
+		boatMoveFrom\_pos0.0\_To\_pos.0.1 & Boat moves from outside to inside at floor 0. & - \\
+		boatMoveFrom\_pos0.1\_To\_pos.0.0 & Boat moves from inside to outside at floor 0. & - \\
+		boatMoveFrom\_pos1.0\_To\_pos.1.1 & Boat moves from outside to inside at floor 1. & - \\
+		boatMoveFrom\_pos1.1\_To\_pos.1.0 & Boat moves from inside to outside at floor 1. & - \\
+		boatMoveFrom\_pos0.1\_To\_pos.1.1 & Will happen on water level increase & valveID \\
+		boatMoveFrom\_pos1.1\_To\_pos.0.1 & Will happen on water level decrease & valveID \\
+		\bottomrule
+		\end{tabular}%
+		\label{tab:addlabel}%
+		\end{table}%
+		
+		
+		\subsection{Signals}
+		\begin{table}[htbp]
+			\centering
+			\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
+			\begin{tabular}{lll}
+				\toprule
+				Actions & \textbf{Description} & \textbf{Parameter} \\
+				\midrule
+				requestGateState\_gateID & Request gate state from gate.  & gateID \\
+				receivedGateState\_gateID & Returns open (true) or closed (false) & gateID \\
+				requestValveState\_valveID & Request valve state from gate. & valveID \\
+				receivedValveState\_valveID & Returns open (true) or closed (false) & valveID \\
+				requestWaterflowState\_valveID & Request waterflow state from valve. & valveID \\
+				receivedWaterflowState\_valveID & Returns on (true) or off (false) & valveID \\
+				requestWaterlevel\_containerIDs & Request waterlevel of two containters. & containerID \\
+				receivedWaterlevel\_containerIDs & Waterlevel comparison. Equal (true) or unequal (false) & containerID \\
+				requestSignalState\_signalID & Request the signal state from signal light & signalID \\
+				receivedSignalState\_signalID & Returns pass (true) or hold (false) & signalID \\
+				requestGateSensor\_gateID & Check if a ship is between the gate doors. & gateID \\
+				receivedGateSensor\_gateID & Returns if a ship is present (true) or not (false) & gateID \\
+				requestShipPresence\_posID & Check a certain position if there is a ship present. & posID \\
+				receivedShipPresence\_posID  & Returns if there is a ship at this ID (true) or not (false) & posID \\
+				\bottomrule
+				\end{tabular}%
+				\label{tab:addlabel}%
+				\end{table}%
+				
+				
