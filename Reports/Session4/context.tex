@@ -1,0 +1,39 @@
+
+\section{Context Description}
+This section describes the 
+\textbf{Definition:}
+Ship lift. General purpose ship lift for elevating ships to a geographically, vertical, higher location. \\
+\subsection{General Outline}
+\begin{itemize}
+	\item no operator - fully autonomous system
+	\item only 2 two levels
+	\item two gates
+	\item two signaling systems, each facing both ways
+	\item one valve per gate
+	\item unlimited water supply on upper level
+	\item Lift is assumed to be big enough for all ships passing through
+\end{itemize}
+\pagebreak
+
+\subsection{Output}
+\begin{enumerate}
+	\item Signal light: pass or hold
+	\item Gates: open or closed
+	\item Valves: open or closed
+\end{enumerate}
+
+\subsection{Input}
+\begin{enumerate}
+	\item Actuator states
+	\begin{itemize}
+		\item Signal light: pass or hold
+		\item Gates: open or closed
+		\item Valves: open or closed
+	\end{itemize}
+	\item Waterflow through valve pipes
+	\item Location of the ship in the system
+	\begin{itemize}
+		\item completely in the lift
+		\item at the signal lights
+	\end{itemize}
+\end{enumerate}
