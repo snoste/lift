@@ -1,5 +1,17 @@
 \section{Interactions}
 
+\subsection{Overview}
+
+Here the system will be described in relations to names of commands and signals of the controller and other sensor components. Here is a picture that relates the names to the components.
+
+\begin{figure}[!h]
+	\includegraphics[width=\linewidth]{PictureName10}
+	\caption{Description of the names}
+	\label{fig:boat1}
+\end{figure}
+\pagebreak
+
+
 \subsection{Commands}
 \begin{table}[htbp]
 	\centering
@@ -8,23 +20,20 @@
 		\toprule
 		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 		\midrule
-		openGate\_gateID & Open gate with the corresponding gate ID & gateID \\
-		closeGate\_gateID & Close gate with the corresponding gate ID & gateID \\
-		openValve\_valveID & Open valve with the corresponding gate ID & valveID \\
-		closeValve\_valveID & Close valve with the corresponding gate ID & valveID \\
-		setSignalPass\_signalID & Set signal to pass with the corresponding ID  & signalID \\
-		setSignalHold\_signalID & Set signal to hold with the corresponding ID  & signalID \\
-		boatMoveFrom\_pos0.0\_To\_pos.0.1 & Boat moves from outside to inside at floor 0. & - \\
-		boatMoveFrom\_pos0.1\_To\_pos.0.0 & Boat moves from inside to outside at floor 0. & - \\
-		boatMoveFrom\_pos1.0\_To\_pos.1.1 & Boat moves from outside to inside at floor 1. & - \\
-		boatMoveFrom\_pos1.1\_To\_pos.1.0 & Boat moves from inside to outside at floor 1. & - \\
-		boatMoveFrom\_pos0.1\_To\_pos.1.1 & Will happen on water level increase & valveID \\
-		boatMoveFrom\_pos1.1\_To\_pos.0.1 & Will happen on water level decrease & valveID \\
+		openGate & Open gate with the corresponding gate ID & gateID \\
+		closeGate & Close gate with the corresponding gate ID & gateID \\
+		openValve & Open valve with the corresponding gate ID & valveID \\
+		closeValve & Close valve with the corresponding gate ID & valveID \\
+		setSignalPass & Set signal to pass with the corresponding ID  & signalID \\
+		setSignalHold & Set signal to hold with the corresponding ID  & signalID \\
+		increaseWaterlevel & Container 1 water level increase & valveID \\
+		decreaseWaterlevel & Container 1 water level decrease & valveID \\
 		\bottomrule
 		\end{tabular}%
 		\label{tab:addlabel}%
 		\end{table}%
 		
+		\pagebreak
 		
 		\subsection{Signals}
 		\begin{table}[htbp]
@@ -34,20 +43,26 @@
 				\toprule
 				Actions & \textbf{Description} & \textbf{Parameter} \\
 				\midrule
-				requestGateState\_gateID & Request gate state from gate.  & gateID \\
-				receivedGateState\_gateID & Returns open (true) or closed (false) & gateID \\
-				requestValveState\_valveID & Request valve state from gate. & valveID \\
-				receivedValveState\_valveID & Returns open (true) or closed (false) & valveID \\
-				requestWaterflowState\_valveID & Request waterflow state from valve. & valveID \\
-				receivedWaterflowState\_valveID & Returns on (true) or off (false) & valveID \\
-				requestWaterlevel\_containerIDs & Request waterlevel of two containters. & containerID \\
-				receivedWaterlevel\_containerIDs & Waterlevel comparison. Equal (true) or unequal (false) & containerID \\
-				requestSignalState\_signalID & Request the signal state from signal light & signalID \\
-				receivedSignalState\_signalID & Returns pass (true) or hold (false) & signalID \\
-				requestGateSensor\_gateID & Check if a ship is between the gate doors. & gateID \\
-				receivedGateSensor\_gateID & Returns if a ship is present (true) or not (false) & gateID \\
-				requestShipPresence\_posID & Check a certain position if there is a ship present. & posID \\
-				receivedShipPresence\_posID  & Returns if there is a ship at this ID (true) or not (false) & posID \\
+				requestGateState & Request gate state from gate.  & gateID \\
+				receivedGateState & Returns open (true) or closed (false) & gateID \\
+				\midrule
+				requestValveState & Request valve state from gate. & valveID \\
+				receivedValveState & Returns open (true) or closed (false) & valveID \\
+				\midrule
+				requestWaterflowState & Request waterflow state from valve. & valveID \\
+				receivedWaterflowState & Returns on (true) or off (false) & valveID \\
+				\midrule
+				requestWaterlevel & Request waterlevel of two containters. & containerID \\
+				receivedWaterlevel & Equal (true) or unequal (false) & containerID \\
+				\midrule
+				requestSignalState & Request the signal state from signal light & signalID \\
+				receivedSignalState & Returns pass (true) or hold (false) & signalID \\
+				\midrule
+				requestGateSensor & Check if a ship is between the gate doors. & gateID \\
+				receivedGateSensor & Returns if a ship is present (true) or not (false) & gateID \\
+				\midrule
+				requestShipPresence & Check a certain position if there is a ship present. & posID \\
+				receivedShipPresence  & Returns if a sip is present (true) or not (false) & posID \\
 				\bottomrule
 				\end{tabular}%
 				\label{tab:addlabel}%
