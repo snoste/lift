@@ -21,17 +21,12 @@
 	
 	\item After a ship has entered the sluice the gate will close
 	\begin{itemize}
-		\item The door can close by closeGate\_gateID request if 
-		
-		------we need to insert the boat position sensors------
+		\item The door can close by closeGate\_gateID request if receivedShipPresence\_posID of the closest position to the gate to close is equal to true
 		
 	\end{itemize}
 	\item A gate can only close if there is no ship in between its doors
 	\begin{itemize}
 		\item If, after a requestGateSensor\_gateID it is received a receivedGateSensor\_gateID=false, then it is possible to send a closeGate\_gateID
-		
-		
-		------we need to insert sensor state-----
 		
 	\end{itemize}
 	
@@ -41,8 +36,10 @@
 	\end{itemize}
 	
 	\item Without a ship in the system the system will remain idle
+	\begin{itemize}
+		\item if the system detect that there are not ship (checking receivedShipPresence\_posID=false for all the 4 position) the system has to close all the door using closeGate\_gateID action an also turn all the signal light to red by the action setSignalHold\-signalID
+	\end{itemize}
 	
-	-----we need to insert outside sensors-----
 	
 	\item Entering signal light:
 		\begin{enumerate}
@@ -59,10 +56,4 @@
 			\item The signal must never indicate pass and hold at the same time
 			\item The signal can only indicate pass if the gate is completely opened
 		\end{enumerate}
-\end{enumerate}
-\subsubsection*{Functionality}
-\begin{enumerate}
-	\item The system should work with a "first come - first serve" principle
-	\item When a ship is waiting at a entry signal light, the light should switch to pass as soon as possible
-	\item After a ship has entered the system, the exit signal light on the other side should switch to pass as soon as possible
 \end{enumerate}
