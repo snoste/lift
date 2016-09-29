@@ -22,11 +22,11 @@
 			\item openValve(valve\_ID) and openGate(gate\_opposite(ID)) cannot be done in parallel.
 		\end{itemize}
 	
-	\item After a ship has entered the sluice the gate will close
-	\begin{itemize}
-		\item it is not possible to send closeGate(gate\_ID) if getShipPresence(pos\_(same(ID).1),false)
-		
-	\end{itemize}
+	%\item After a ship has entered the sluice the gate will close
+	%\begin{itemize}
+	%	\item it is not possible to send closeGate(gate\_ID) if getShipPresence(pos\_(same(ID).1),false)	
+	%\end{itemize}
+	
 	\item A gate can only close if there is no ship in between its doors
 	\begin{itemize}
 		\item it is not possible to send closeGate(gate\_ID) if getGateSensor(gate\_same(ID),true)
@@ -34,13 +34,16 @@
 	
 	\item A gate can only open if the water level on both sides is equal
 	\begin{itemize}
-		\item It is not possible to openGate(gate\_ID) if compareWaterlevel(Container\_same(ID))
-		\item Before open a gate, the system must check if the level of two container adjacent to the gate are equal: first send requestWaterlevel\_containerID to the two adjacent container and than check if the two receivedWaterlevel\_containerID value are the same. The system now can open the gate securely.
+		\item It is not possible to openGate(gate\_ID) if compareWaterlevel(Container\_same(ID),false)
+
 	\end{itemize}
 	
 	\item Without a ship in the system the system will remain idle
 	\begin{itemize}
-		\item if the system detect that there are not ship (checking receivedShipPresence\_posID=false for all the 4 position) the system has to close all the door using closeGate\_gateID action an also turn all the signal light to red by the action setSignalHold\-signalID
+		\item If getShipPresence(pos\_all(ID), false) it is not possible to send openGate(gate\_all(ID)), it is not possible to send setSignalPass(signal\_all(ID)) and it is not possible to send openValve(valve\_all(ID)) nor closeValve(valve\_all(ID))
+		
+		
+		%\item if the system detect that there are not ship (checking receivedShipPresence\_posID=false for all the 4 position) the system has to close all the door using closeGate\_gateID action an also turn all the signal light to red by the action setSignalHold\-signalID
 	\end{itemize}
 	
 	
