@@ -28,6 +28,7 @@ Figure \ref{fig:boat1} describes the system in relation to names of commands and
 		setSignalHold & Set signal to hold with the corresponding ID  & signalID \\
 		increaseWaterlevel & Container 1 water level increase & valveID \\
 		decreaseWaterlevel & Container 1 water level decrease & valveID \\
+		setIdleState & Puts the system into idle state & level \\ %level: top or bottom
 		\bottomrule
 		\end{tabular}%
 		\label{tab:addlabel}%
@@ -41,16 +42,18 @@ Figure \ref{fig:boat1} describes the system in relation to names of commands and
 			\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
 			\begin{tabular}{lll}
 				\toprule
-				Actions & \textbf{Description} & \textbf{Parameter} \\
-				getGateState & Returns open (true) or closed (false) & gateID, \textit{B} \\
-				getValveState & Returns open (true) or closed (false) & valveID, \textit{B} \\
-				getWaterflowState & Returns on (true) or off (false) & valveID, \textit{B} \\
-				compareWaterlevel & \parbox[t]{3in}{Compare ContainerID to Container X.1. \par Equal (true) or unequal (false)} & containerID, \textit{B} \\
-				getSignalState & Returns pass (true) or hold (false) & signalID, \textit{B} \\
-				getGateSensor & Returns if a ship is present (true) or not (false) & gateID, \textit{B} \\
-				getShipPresence  & Returns if a sip is present (true) or not (false) & posID, \textit{B} \\
+				\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
+				\hline
+				getGateState & Returns open (true) or closed (false) & gateID, $ \mathbb{B} $ \\
+				getValveState & Returns open (true) or closed (false) & valveID, $ \mathbb{B} $ \\
+				getWaterflowState & Returns on (true) or off (false) & valveID, $ \mathbb{B} $ \\
+				compareWaterlevel & \parbox[t]{3in}{Compare ContainerID to Container X.1. \par Equal (true) or unequal (false)} & containerID, $ \mathbb{B} $ \\
+				getSignalState & Returns pass (true) or hold (false) & signalID, $ \mathbb{B} $ \\
+				getGateSensor & Returns if a ship is present (true) or not (false) & gateID, $ \mathbb{B} $ \\
+				getShipPresence  & Returns if a sip is present (true) or not (false) & posID, $ \mathbb{B} $ \\
+				getIdleState & Returns if the system is in idle state & level, $ \mathbb{B} $ \\
 				\bottomrule
-				\end{tabular}%
+			\end{tabular}%
 				\label{tab:addlabel}%
 				\end{table}%
 				
