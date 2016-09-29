@@ -29,8 +29,11 @@
 	
 \subsubsection*{Functionality}
 \begin{enumerate}
-	\item The system should work with a "first come - first serve" principle
-	\label{Req_FIFO}
-	\item When a ship is waiting at a entry signal light, the light should switch to pass as soon as possible (with respect to functionality requirement \ref{Req_FIFO})
-	\item After a ship has entered the sluice, the exit signal light on the other side should switch to pass as soon as possible (with respect to functionality requirement \ref{Req_FIFO})
+	\item If the system is in idle the first ship to arrive at a signal light should get served first
+	\item If the system is not in idle state, a ship is leaving the system and there
+	\begin{enumerate}
+		\item is no other boat waiting, the system should enter idle state
+		\item are boats waiting on one side of the lift, the first boat in line gets served 
+		\item are boats waiting on both sides of the lift, then the first boat on the current level gets served
+	\end{enumerate}
 \end{enumerate}
