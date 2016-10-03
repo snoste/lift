@@ -12,11 +12,17 @@
 		closeGate & Close gate with the corresponding gate ID & gateID \\
 		openValve & Open valve with the corresponding gate ID & valveID \\
 		closeValve & Close valve with the corresponding gate ID & valveID \\
-		setSignalPass & Set signal to pass with the corresponding ID  & signalID \\
-		setSignalHold & Set signal to hold with the corresponding ID  & signalID \\
-		increaseWaterlevel & Container 1 water level increase & valveID \\
-		decreaseWaterlevel & Container 1 water level decrease & valveID \\
-		setIdleState & Puts the system into idle state & level \\ %level: top or bottom
+		haltSignal & Turn the halt signal of given Signal Light on or of & signalID, $\mathbb{B}$\\
+		passSignal & Turn the pass signal of given Signal Light on or of & signalID, $\mathbb{B}$\\
+		setSignalPass & Set signal to pass with the corresponding ID  & \{0, signalID\} \\
+		setWaterLevel & Set the waterlevel to given level & Level\\
+		setGateOpen & Open the given gate & \{0, gateID\} \\
+		signalReady & setSignalPass successful & None\\
+		signalError & setSignalPass not successful & None \\
+		gateReady & setGateOpen successful & None\\
+		gateError & setGateOpen not successful & None\\
+		waterLevelReady & setWaterLevel successful & None\\
+		waterLevelError & setWaterLevel not successful & None\\
 		\bottomrule
 		\end{tabular}%
 		\label{tab:addlabel}%
@@ -26,17 +32,17 @@
 		\begin{table}[htbp]
 			\centering
 			\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
-			\begin{tabular}{lll}
+			\begin{tabular}{lp{3in}l}
 				\toprule
 				\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 				\hline
 				getGateState & Returns open (true) or closed (false) & gateID, $ \mathbb{B} $ \\
 				getValveState & Returns open (true) or closed (false) & valveID, $ \mathbb{B} $ \\
 				getWaterflowState & Returns on (true) or off (false) & valveID, $ \mathbb{B} $ \\
-				compareWaterlevel & \parbox[t]{3in}{Compare ContainerID to Container X.1. \par Equal (true) or unequal (false)} & containerID, $ \mathbb{B} $ \\
+				compareWaterlevel & Compare ContainerID to Container X.1. Equal (true) or unequal (false) & containerID, $ \mathbb{B} $ \\
 				getSignalState & Returns pass (true) or hold (false) & signalID, $ \mathbb{B} $ \\
-				getGateSensor & Returns if a ship is present (true) or not (false) & gateID, $ \mathbb{B} $ \\
-				getShipPresence  & Returns if a sip is present (true) or not (false) & posID, $ \mathbb{B} $ \\
+				getGateSensor &  Returns true if something is inbetween the gates, otherwise false & gateID, $ \mathbb{B} $ \\
+				getShipPresence  & Returns true, if a ship is present at the given position, otherwise false & posID, $ \mathbb{B} $ \\
 				getIdleState & Returns if the system is in idle state & level, $ \mathbb{B} $ \\
 				\bottomrule
 			\end{tabular}%
