@@ -14,19 +14,16 @@
 		closeValve & Close valve with the corresponding gate ID & valveID \\
 		haltSignal & Turn the halt signal of given Signal Light on or of & signalID, $\mathbb{B}$\\
 		passSignal & Turn the pass signal of given Signal Light on or of & signalID, $\mathbb{B}$\\
-		setSignalPass & Set signal to pass with the corresponding ID  & \{0, signalID\} \\
-		setWaterLevel & Set the waterlevel to given level & Level\\
-		setGateOpen & Open the given gate & \{0, gateID\} \\
-		signalReady & setSignalPass successful & None\\
-		signalError & setSignalPass not successful & None \\
-		gateReady & setGateOpen successful & None\\
-		gateError & setGateOpen not successful & None\\
-		waterLevelReady & setWaterLevel successful & None\\
-		waterLevelError & setWaterLevel not successful & None\\
-		\bottomrule
-		\end{tabular}%
-		\label{tab:addlabel}%
-		\end{table}%
+
+\bottomrule
+\end{tabular}%
+\label{tab:addlabel}%
+\end{table}%
+		
+		
+		
+
+
 		
 		\subsection{Signals}
 		\begin{table}[htbp]
@@ -36,13 +33,13 @@
 				\toprule
 				\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 				\hline
-				getGateState & Returns open (true) or closed (false) & gateID, $ \mathbb{B} $ \\
-				getValveState & Returns open (true) or closed (false) & valveID, $ \mathbb{B} $ \\
-				getWaterflowState & Returns on (true) or off (false) & valveID, $ \mathbb{B} $ \\
+				gateState & Returns open (true) or closed (false) & gateID, $ \mathbb{B} $ \\
+				valveState & Returns open (true) or closed (false) & valveID, $ \mathbb{B} $ \\
+				waterflowState & Returns on (true) or off (false) & valveID, $ \mathbb{B} $ \\
 				compareWaterlevel & Compare ContainerID to Container X.1. Equal (true) or unequal (false) & containerID, $ \mathbb{B} $ \\
-				getSignalState & Returns pass (true) or hold (false) & signalID, $ \mathbb{B} $ \\
-				getGateSensor &  Returns true if something is inbetween the gates, otherwise false & gateID, $ \mathbb{B} $ \\
-				getShipPresence  & Returns true, if a ship is present at the given position, otherwise false & posID, $ \mathbb{B} $ \\
+				signalState & Returns pass (true) or hold (false) & signalID, $ \mathbb{B} $ \\
+				gateSensor &  Returns true if something is inbetween the gates, otherwise false & gateID, $ \mathbb{B} $ \\
+				shipPresence  & Returns true, if a ship is present at the given position, otherwise false & posID, $ \mathbb{B} $ \\
 				\bottomrule
 			\end{tabular}%
 				\label{tab:addlabel}%

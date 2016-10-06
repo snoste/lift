@@ -16,14 +16,35 @@ The functioning of the sub controllers in combination with the actions and signa
 	\label{fig:subcontrollers}
 \end{figure}
 \subsection{Master controller}
-Master controller keeps track of the position of the ship inside the system. Its responsible for coordinating the sequence of actions that are executed. These are either to set the gates, valves or signals. It gets confirmations or error signals back from the other sub controllers to either confirm or refute actions were carried out. 
+Master controller keeps track of the position of the ship inside the system. Its responsible for coordinating the sequence of actions that are executed. These are either to set the gates, valves or signals. It gets confirmations or error signals back from the other sub controllers to either confirm or refute actions were carried out. \\
+
+In Table \ref{tab:internal} is a list of internal commands which the master controller uses to communicate with other sub controllers.
+
+\begin{table}[htbp]
+	\centering
+	\caption{Internal commands}
+	\begin{tabular}{lll}
+		\toprule
+		\textbf{Internal actions} & \textbf{Description} & \textbf{Parameter} \\
+		\midrule
+		setSignalPass & Set signal to pass with the corresponding ID  & \{0, signalID\} \\
+		setWaterLevel & Set the waterlevel to given level & Level\\
+		setGateOpen & Open the given gate & \{0, gateID\} \\
+		signalReady & setSignalPass successful & None\\
+		signalError & setSignalPass not successful & None \\
+		gateReady & setGateOpen successful & None\\
+		gateError & setGateOpen not successful & None\\
+		waterLevelReady & setWaterLevel successful & None\\
+		waterLevelError & setWaterLevel not successful & None\\
+		\bottomrule
+	\end{tabular}%
+	\label{tab:internal}%
+\end{table}%
+
+
 \subsection{Gate controller}
 The gate controller ensures the safety requirements are met. It gets a close or open command for the gates from the master controller. It send back a Gateready signal back to the master to confirm a gate has been safely opened or closed. 
 \subsection{Valve controller}
-The valve controller gets setWaterlevel command from the master controller to set the waterlevel to be equal to container x.1. It receives the getWaterflowstate\_ID and getValvestate\_ID to know if a valve is either open or closed or there is is water flowing through the valve. It executes the external actions openValve\_ID and closeValve\_ID to actually open or close a valve.  
+The valve controller gets setWaterlevel command from the master controller to set the waterlevel to be equal to container x.1. It receives the waterflowstate\_ID and valvestate\_ID to know if a valve is either open or closed or there is is water flowing through the valve. It executes the external actions openValve\_ID and closeValve\_ID to actually open or close a valve.  
 \subsection{Signal controller}
-The signal controller receives a SetSignalPass\_ID from the master controller. It sends back that the signal has been set with Signalready or Signalerror when this was not accomplished. The signal subcontroller executes the external action SetSignalHold\_ID or SetSignalPass\_ID to set the signallights. 
-\subsection{Meeting questions}
-Error messages; if a ship is still in between one of the gates
-What is the main task of a sub controller?
- 
+The signal controller receives a SetSignalPass\_ID from the master controller. It sends back that the signal has been set with Signalready or Signalerror when this was not accomplished. The signal subcontroller executes the external action SetSignalHold\_ID or SetSignalPass\_ID to set the signal lights. 

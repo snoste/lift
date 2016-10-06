@@ -3,7 +3,7 @@
 	\item Only one gate can be open at a time
 	
 		\begin{itemize}
-			\item It is only possible to send an openGate(gate\_ID) if getGateState(gate\_opposite(ID),false).
+			\item It is only possible to send an openGate(gate\_ID) if the opposite gate\_ID is closed. That is getGateState(gate\_opposite(ID),false).
 			\item openGate(gate\_ID) and openGate(gate\_opposite(ID)) cannot be done in parallel.
 			
 		\end{itemize}
