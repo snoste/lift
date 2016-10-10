@@ -1,0 +1,131 @@
+
+% The sort
+sort
+
+% States of the system
+systemstate =  struct idle ? isIdle |
+               boatMoving ? isBoatMoving |
+               boatLifting ? isBoatLifting;
+
+
+%General components and their states
+GateID = struct G0 | G1 | G_none;
+ValveID = struct V0 | V1;
+SID = struct S00 | S01 | S10 | S11 | S_none;
+
+LevelID = struct L0 | L1;
+PositionID = struct P00 | P01 | P10 | P11;
+
+% Sub controllers
+
+%Gate to master and master to gate
+M2G = struct	setGateOpen ? isGateOpened;
+G2M = struct	gateReady ? isGateReady |
+		gateError ? isGateError;
+
+%signal to master and master to signal
+M2S = struct	setSignalPass ? isSignalSetPass;
+S2M = struct	signalReady ? isSignalReady |
+		signalError ? isSignalError;
+
+%Valve to master and master to valve
+M2V = struct	setWaterLevel ? isWaterLevelReady;
+V2M = struct 	valveReady ? isValveReady |
+                valveError ? isValveError;
+
+
+% Mapping the positions and moving between the
+map
+boatMove : Position -> Position;
+
+var boatEntered, systemInit : Bool;
+
+map 
+
+
+act 
+%Master Controller actions
+shipPresence: PositionID -> Bool;
+setGateOpen: GateID; 
+setSignalPass: SLID;
+setWaterLevel: LevelID;
+
+
+%Gate subcontroller actions
+openGate, closeGate: GateID;
+gateState, gateSensor: GateID -> Bool;
+
+%Signal subcontroller actions
+setSignalHold, setSignalPass: SLID;
+signalState: SLID -> Bool;
+
+%Valve subcontroller actions
+openValve, closeValve: valveID;
+waterFlowState, valveState, compareWaterLevel: GateID -> Bool;
+
+
+proc
+
+%Master Controller process
+
+
+%Gate subcontroller process
+
+%Signal subcontroller process
+
+%Valve subcontroller process
+
+
+%0) wait
+
+%1) If (Boat at initial position P00) and !boatEntered then setPass(S00) else wait
+
+
+%1.1) If 
+
+
+%2) If (Boat at initial position P11) and !boatEntered then setPass(S11)
+	
+
+
+%We assume
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+init 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
