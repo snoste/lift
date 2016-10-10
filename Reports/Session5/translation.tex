@@ -3,47 +3,41 @@
 	\item Only one gate can be open at a time
 	
 		\begin{itemize}
-			\item It is only possible to send an openGate(gate\_ID) if the opposite gate\_ID is closed, verified by: getGateState(gate\_opposite(ID),false).
-			\item openGate(gate\_ID) and openGate(gate\_opposite(ID)) cannot be done in parallel.
+			\item An openGate(0) action cannot be followed by an openGate(1) action unless a closeGate(0) action happened in between.
+			\item An openGate(1) action cannot be followed by an openGate(0) action unless a closeGate(1) action happened in between.
 			
 		\end{itemize}
 	
 	\item Only one valve can be open at a time
 	
 		\begin{itemize}
-			\item It is only possible to send an openValve(valve\_ID) if getValveState(valve\_opposite(ID),false).
-			\item openValve(valve\_ID) and openValve(gate\_opposite(ID)) cannot be done in parallel.
+			\item An openValve(0) action cannot be followed by an openValve(1) action unless a closeValve(0) action happened in between.
+			\item An openValve(1) action cannot be followed by an openValve(0) action unless a closeValve(1) action happened in between.
 		\end{itemize}
 	
 	\item A valve and gate at different levels can never be open at the same time
 		\begin{itemize}
-			\item It is only possible to send an openGate(gate\_ID) if getValveState(valve\_opposite(ID),false).
-			\item It is only possible to send an openValve(valve\_ID) if getGateState(gate\_opposite(ID)),false).
-			\item openValve(valve\_ID) and openGate(gate\_opposite(ID)) cannot be done in parallel.
+			\item An openValve(0) action is not allowed after an openGate(1) action, and visa versa.
+			\item An openValve(1) action is not allowed after an openGate(0) action, and visa versa.
 		\end{itemize}
-	
-	%\item After a ship has entered the sluice the gate will close
-	%\begin{itemize}
-	%	\item it is not possible to send closeGate(gate\_ID) if getShipPresence(pos\_(same(ID).1),false)	
-	%\end{itemize}
 	
 	\item A gate can only close if there is no ship in between its doors
 	\begin{itemize}
-		\item it is not possible to send closeGate(gate\_ID) if getGateSensor(gate\_same(ID),true)
+		\item A closeGate(gateID) can only be done after gateSensor(gateID, false)
 	\end{itemize}
 	
 	\item A gate can only open if the water level on both sides is equal
 	\begin{itemize}
-		\item It is not possible to openGate(gate\_ID) if compareWaterlevel(Container\_same(ID),false)
+		\item An openGate(1) action can only be done after compareWaterlevel(container1.0, true)
+		\item An openGate(0) action can only be done after compareWaterlevel(container0.0, true)
 
 	\end{itemize}
 	
-	\item Without a ship in the system the system will remain idle
+	\item Without a ship in the system the system will go into idle
 	\begin{itemize}
-		\item If getShipPresence(pos\_all(ID), false) it is not possible to send openGate(gate\_all(ID)), it is not possible to send setSignalPass(signal\_all(ID)) and it is not possible to send openValve(valve\_all(ID)) nor closeValve(valve\_all(ID))
+		\item If shipPresence()
 		
 		
-		%\item if the system detect that there are not ship (checking receivedShipPresence\_posID=false for all the 4 position) the system has to close all the door using closeGate\_gateID action an also turn all the signal light to red by the action setSignalHold\-signalID
 	\end{itemize}
 	
 	
