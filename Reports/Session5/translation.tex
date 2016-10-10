@@ -26,13 +26,13 @@
 	
 	\item A gate can only open if the water level on both sides is equal
 		\begin{itemize}
-			\item An openGate(1) action can only be done after compareWaterlevel(container1.0, true)
-			\item An openGate(0) action can only be done after compareWaterlevel(container0.0, true)
+			\item An openGate(1) action can only be done after compareWaterlevel(1.0, true)
+			\item An openGate(0) action can only be done after compareWaterlevel(0.0, true)
 		\end{itemize}
 	
 	\item Without a ship in the system the system will go into idle
 		\begin{itemize}
-			\item If shipPresence()
+			\item if every shipPresence(posID, false) do a haltSignal(signalID, true) for every signalID, a passSignal(signalID, false) for every signalID, followed by a closeGate(0) and closeGate(1) action.
 		\end{itemize}
 	
 	\item Entering signal light:
