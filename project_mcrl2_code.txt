@@ -1,4 +1,4 @@
-
+%--------------------------------------
 % The sort
 sort
 
@@ -9,9 +9,10 @@ systemstate =  struct idle ? isIdle |
 
 
 %General components and their states
-GateID = struct G0 | G1 | G_none;
+GateID_none = struct G0n | G1n | G_none;
+GateID = struct G0 | G1;
 ValveID = struct V0 | V1;
-SID = struct S00 | S01 | S10 | S11 | S_none;
+SLID = struct S00 | S01 | S10 | S11 | S_none;
 
 LevelID = struct L0 | L1;
 PositionID = struct P00 | P01 | P10 | P11;
@@ -19,7 +20,7 @@ PositionID = struct P00 | P01 | P10 | P11;
 % Sub controllers
 
 %Gate to master and master to gate
-M2G = struct	setGateOpen ? isGateOpened;
+M2G = struct	setGateOpen ? isSetGateOpen;
 G2M = struct	gateReady ? isGateReady |
 		gateError ? isGateError;
 
@@ -33,22 +34,28 @@ M2V = struct	setWaterLevel ? isWaterLevelReady;
 V2M = struct 	valveReady ? isValveReady |
                 valveError ? isValveError;
 
-
+%--------------------------------------
 % Mapping the positions and moving between the
-map
-boatMove : Position -> Position;
-
-var boatEntered, systemInit : Bool;
-
-map 
+%map
+%boatMove : Position -> Position;
 
 
-act 
+%--------------------------------------
+%eqn
+
+
+%--------------------------------------
+act
 %Master Controller actions
 shipPresence: PositionID -> Bool;
-setGateOpen: GateID; 
+setGateOpen: GateID_none; 
+isSetGateOpen: Bool;
 setSignalPass: SLID;
 setWaterLevel: LevelID;
+
+gateReady, gateError, signalReady, signalError, valveReady, valveError;
+isGateReady, isGateError, isSignalReady, isSignalError, isValveReady, isValveError: Bool;
+
 
 
 %Gate subcontroller actions
@@ -56,20 +63,52 @@ openGate, closeGate: GateID;
 gateState, gateSensor: GateID -> Bool;
 
 %Signal subcontroller actions
-setSignalHold, setSignalPass: SLID;
+haltSignal, passSignal: SLID;
 signalState: SLID -> Bool;
 
 %Valve subcontroller actions
-openValve, closeValve: valveID;
+openValve, closeValve: ValveID;
 waterFlowState, valveState, compareWaterLevel: GateID -> Bool;
 
+m_recFromGate, m_sendToGate : M2G;
+g_recFromMaster, g_sendToMaster : G2M; 
 
+m_recFromSignal, m_sendToSignal : M2S;
+s_recFromMaster, s_sendToMaster : S2M;
+
+m_recFromSignal, m_sendToSignal : M2V;
+v_recFromMaster, v_sendToMaster : V2M;
+
+%--------------------------------------
 proc
 
 %Master Controller process
 
 
 %Gate subcontroller process
+%1) setGateOpen(GateID
+
+%Gate_Controller_proc 
+GCp = sum Gvar_none:GateID_none.g_recFromMaster(setGateOpen(Gvar_none)).(
+	%Close any door that is open!	
+	(Gvar_none == G_none) ->  
+		%Check if either gate is open and close them if they are, and send a gateReady to Master after closing. And if both are closed then send a gateReady back to Master
+		(((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GCp) <> 
+			((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GCp) <> sendToMaster(gateReady).GCp)))
+	%	
+	+((Gvar_none == G0n) -> 
+		((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp)))
+	%
+	+((Gvar_none == G1n) -> 
+		((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp))));
+
+%Loop until a ship is not inbetween the gate and then close it
+Gate0_close = (gateSensor(G0)==false) -> closeGate(G0) <> Gate0_close; 
+Gate1_close = (gateSensor(G1)==false) -> closeGate(G1) <> Gate1_close;
+
+%Do we really need to check if the waterlevel has changed as the master checks it and only opens a gate if it is safe
+Gate0_open = closeGate(G0);
+Gate1_open = closeGate(G1);
 
 %Signal subcontroller process
 
@@ -86,46 +125,8 @@ proc
 
 %2) If (Boat at initial position P11) and !boatEntered then setPass(S11)
 	
-
-
-%We assume
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-init 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+%--------------------------------------
+%All gates are closed, all lights indicate Halt, valve V0 is open and valve V1 is closed.
+init
+m_sendToGate(setGateOpen(G0));
 
