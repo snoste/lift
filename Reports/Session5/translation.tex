@@ -1,53 +1,83 @@
 \section{Translation of the Requirements into Interaction}
 \begin{enumerate}
 	\item Only one gate can be open at a time	
-		\begin{itemize}
-			\item An openGate(0) action cannot be followed by an openGate(1) action unless a closeGate(0) action happened in between.
-			\item An openGate(1) action cannot be followed by an openGate(0) action unless a closeGate(1) action happened in between.
-			
-		\end{itemize}
+	\begin{itemize}
+		\item An openGate(0) action cannot be followed by an openGate(1) action unless a closeGate(0) action happened in between.
+		\item An openGate(1) action cannot be followed by an openGate(0) action unless a closeGate(1) action happened in between.
+		
+	\end{itemize}
 	
 	\item Only one valve can be open at a time	
-		\begin{itemize}
-			\item An openValve(0) action cannot be followed by an openValve(1) action unless a closeValve(0) action happened in between.
-			\item An openValve(1) action cannot be followed by an openValve(0) action unless a closeValve(1) action happened in between.
-		\end{itemize}
+	\begin{itemize}
+		\item An openValve(0) action cannot be followed by an openValve(1) action unless a closeValve(0) action happened in between.
+		\item An openValve(1) action cannot be followed by an openValve(0) action unless a closeValve(1) action happened in between.
+	\end{itemize}
 	
 	\item A valve and a gate at different levels can never be open at the same time
-		\begin{itemize}
-			\item An openValve(0) action is not allowed after an openGate(1) action, and visa versa.
-			\item An openValve(1) action is not allowed after an openGate(0) action, and visa versa.
-		\end{itemize}
+	\begin{itemize}
+		\item An openValve(0) action is not allowed after an openGate(1) action, and visa versa.
+		\item An openValve(1) action is not allowed after an openGate(0) action, and visa versa.
+	\end{itemize}
 	
 	\item A gate can only close if there is no ship in between its doors
-		\begin{itemize}
-			\item A closeGate(gateID) can only be done after gateSensor(gateID, false)
-		\end{itemize}
+	\begin{itemize}
+		\item A closeGate(gateID) can only be done after gateSensor(gateID, false)
+	\end{itemize}
 	
 	\item A gate can only open if the water level on both sides is equal
-		\begin{itemize}
-			\item An openGate(1) action can only be done after compareWaterlevel(1.0, true)
-			\item An openGate(0) action can only be done after compareWaterlevel(0.0, true)
-		\end{itemize}
+	\begin{itemize}
+		\item An openGate(1) action can only be done after compareWaterlevel(1.0, true)
+		\item An openGate(0) action can only be done after compareWaterlevel(0.0, true)
+	\end{itemize}
 	
-	\item Without a ship in the system the system will go into idle
+	\item Signal light:
+	\begin{enumerate}
+		\item The signal can never be off nor indicate hold and pass at the same time
+		\begin{itemize}
+			\item passSignal(SignalID, true) has to be followed directly by a haltSignal(SignalID, false)
+			\item haltSignal(SignalID, true) has to be followed directly by a passSignal(SignalID, false)
+			\item passSignal(SignalID, false) can only be issued directly after haltSignal(SignalID, true)
+			\item haltSignal(SignalID, false) can only be issued directly after passSignal(SignalID, true)
+		\end{itemize}
+		\item The signal can only indicate pass if the gate is completely opened
+		\begin{itemize}
+			\item A passSignal(0.0, true) or passSignal(0.1, true) action can not be done after an openGate(0) action when gateState(0, false)
+			\item A passSignal(1.0, true) or passSignal(1.1, true) action can not be done after an openGate(1) action when gateState(1, false)
+		\end{itemize}
+		\item The entering signal can only indicate pass if there is no ship in the system already
+		\begin{itemize}
+			\item if shipPresence(0.1, true) or shipPresence(1.1,true) it is not possible to do a passSignal(0.0, true) or passSignal(1.0) action 
+		\end{itemize}
+	\end{enumerate}
+\end{enumerate}
+
+\subsubsection*{Functionality}
+\begin{enumerate}
+	\item If the system is in idle the first ship to arrive at a signal light should get served first
+	\begin{itemize}
+		\item if every gateState(gateID, false), compareWaterlevel(0.0, true) and shipPresence(0.0, true), an openGate(0) action will be done, after eventually an openGate(1) action will follow.
+		\item if every gateState(gateID, false), compareWaterlevel(0.0, false) and shipPresence(0.0, true), an openValve(0) action will be done, after eventually an openGate(1) action will follow.
+		\item if every gateState(gateID, false), compareWaterlevel(1.0, true) and shipPresence(1.0, true), an openGate(1) action will be done after eventually an openGate(0) action will follow.
+		\item if every gateState(gateID, false), compareWaterlevel(1.0, false) and shipPresence(1.0, true), an openValve(1) action will be done, after eventually an openGate(0) action will follow.
+	\end{itemize}
+	\item If the system is not in idle state, a ship is leaving the system and there
+	\begin{enumerate}
+		\item is no other boat waiting, the system should enter idle state
 		\begin{itemize}
 			\item if every shipPresence(posID, false) do a haltSignal(signalID, true) for every signalID, a passSignal(signalID, false) for every signalID, followed by a closeGate(0) and closeGate(1) action.
 		\end{itemize}
-	
-	\item Entering signal light:
-		\begin{enumerate}
-			\item The signal must always be on
-			\item The signal must never indicate pass and hold at the same time
-			\item The signal can only indicate pass if the gate is completely opened
-			\item The signal can only indicate pass if there is no ship in the system
-			\item When the system is in idle state all doors must be closed.
-			
-		\end{enumerate}
-	\item Leaving signal light:
-		\begin{enumerate}
-			\item The signal must always be on
-			\item The signal must never indicate pass and hold at the same time
-			\item The signal can only indicate pass if the gate is completely opened
-		\end{enumerate}
+		\item are boats waiting on one side of the lift, the first boat in line gets served
+		\begin{itemize}
+			\item if only shipPresence(0.0, true), compareWaterlevel(0.0, true), gateState(0, true), a passSignal(0.0) action will be done, after eventually an openGate(1) action will follow.
+			\item if only shipPresence(0.0, true), compareWaterlevel(0.0, false), a closeGate(1) action will be done, followed by an openValve(0) action, an openGate(0) action and eventually by an openGate(1) action.
+			\item if only shipPresence(1.0, true), compareWaterlevel(1.0, true), gateState(1, true), a passSignal(1.0) action will be done, after eventually an openGate(0) action will follow.
+			\item if only shipPresence(1.0, true), compareWaterlevel(1.0, false), a closeGate(0) action will be done, followed by an openValve(1) action, an openGate(1) action and eventually by an openGate(0) action.
+		\end{itemize} 
+		\item are boats waiting on both sides of the lift, then the first boat on the current level gets served
+		\begin{itemize}
+			\item if shipPresence(0.0, true), shipPresence(1.0, true), compareWaterlevel0.0, true), an passSignal(0.0,true) action will be done after eventually an openGate(1) action will follow.
+			\item if shipPresence(0.0, true), shipPresence(1.0, true), compareWaterlevel1.0, true), an passSignal(1.0,true) action will be done after eventually an openGate(0) action will follow.
+		\end{itemize}
+	\end{enumerate}
 \end{enumerate}
+
