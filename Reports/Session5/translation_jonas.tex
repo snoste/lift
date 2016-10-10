@@ -1,4 +1,5 @@
 \section{Translation of the Requirements into Interaction}
+
 \begin{enumerate}
 	\item Only one gate can be open at a time
 		\begin{itemize}
@@ -11,7 +12,7 @@
 			\item It is only possible to send an openValve(ValveID$_i$) to open Valve $i$ after a getValveState(ValveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(ValveID$_j$) has not been issued in the meantime, for $i \neq j$
 		\end{itemize}
 	
-	\item A valve and gate at different levels can never be open at the same time
+	\item A valve and a gate at different levels can never be open at the same time
 		\begin{itemize}
 			\item It is only possible to send an openGate(GateID$_i$) to open Gate $i$ after a getValveState(ValveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(ValveID$_j$) has not been issued in the meantime, for Gate $i$ and Valve $j$ are on opposite sides of the lift 
 			\item It is only possible to send an openValve(ValveID$_i$) to open Valve $i$ after a getGateState(GateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(GateID$_j$) has not been issued in the meantime, for Valve $i$ and Gate $j$ are on opposite sides of the lift
