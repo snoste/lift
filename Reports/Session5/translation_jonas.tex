@@ -4,13 +4,12 @@
 \begin{enumerate}
 	\item Only one gate can be open at a time
 		\begin{itemize}
-			\item It is only possible to send an openGate(gateID$_i$) to open gate $i$ after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for $i \neq j$
+			\item It is only possible to send an openGate(gateID$_i$) to open gate $i$ after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$
 		\end{itemize}
 	
 	\item Only one valve can be open at a time
-	
 		\begin{itemize}
-			\item It is only possible to send an openValve(valveID$_i$) to open valve $i$ after a valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for $i \neq j$
+			\item It is only possible to send an openValve(valveID$_i$) to open valve $i$ after a valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$
 		\end{itemize}
 	
 	\item A valve and a gate at different levels can never be open at the same time
