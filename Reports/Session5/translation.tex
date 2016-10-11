@@ -29,10 +29,7 @@
 		\item An openGate(1) action can only be done after compareWaterlevel(1.0, true)
 		\item An openGate(0) action can only be done after compareWaterlevel(0.0, true)
 	\end{itemize}
-	
-	\item Signal light:
-	\begin{enumerate}
-		\item The signal can never be off nor indicate hold and pass at the same time
+	\item The signal can never be off nor indicate hold and pass at the same time
 		\begin{itemize}
 			\item passSignal(SignalID, true) has to be followed directly by a haltSignal(SignalID, false)
 			\item haltSignal(SignalID, true) has to be followed directly by a passSignal(SignalID, false)
@@ -44,12 +41,11 @@
 			\item A passSignal(0.0, true) or passSignal(0.1, true) action can not be done after an openGate(0) action when gateState(0, false)
 			\item A passSignal(1.0, true) or passSignal(1.1, true) action can not be done after an openGate(1) action when gateState(1, false)
 		\end{itemize}
-		\item The entering signal can only indicate pass if there is no ship in the system already
+		\item The entering signal can only indicate pass if there is no ship in the lift already
 		\begin{itemize}
 			\item if shipPresence(0.1, true) or shipPresence(1.1,true) it is not possible to do a passSignal(0.0, true) or passSignal(1.0) action 
 		\end{itemize}
 	\end{enumerate}
-\end{enumerate}
 
 \subsubsection*{Functionality}
 \begin{enumerate}

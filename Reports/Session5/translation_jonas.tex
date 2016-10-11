@@ -44,7 +44,7 @@
 		\begin{itemize}
 			\item It is only possible to send a passSignal(signalID$_i$, true) to set signal $i$ to pass after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift
 		\end{itemize}
-	\item An entering signal lights can only indicate pass if there is no ship in the lift
+	\item An entering signal can only indicate pass if there is no ship in the lift already
 		\begin{itemize}
 			\item It is only possible to send a passSignal(signalID$_i$, true) to set signal $i$ to pass after shipPresence(posID, $\mathbb{B}$) delivers $\mathbb{B} = false$ for posID = (ID of container X.1)
 		\end{itemize}
