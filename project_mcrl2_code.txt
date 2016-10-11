@@ -3,7 +3,7 @@
 sort
 
 % States of the system
-systemstate =  struct idle ? isIdle |
+state =  struct idle ? isIdle |
                boatMoving ? isBoatMoving |
                boatLifting ? isBoatLifting;
 
@@ -83,14 +83,21 @@ v_recFromMaster, v_sendToMaster : V2M;
 proc
 
 %Master Controller process
-
+% States of the system
+%state =  struct idle ? isIdle |
+%               boatMoving ? isBoatMoving |
+%               boatLifting ? isBoatLifting;
+MC(s:state,) = isIdle(s) -> sum init_pos:P00,P10.getPresence(init_pos).(
+				(init_pos == P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(openGate(G0n)).m_sendToSignal(setSignalPass(S00)).MC(boatMove) +
+				(init_pos == P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(openGate(G1n)).m_sendToSignal(setSignalPass(S10)).MC(boatMove) <> MC(idle))+
+	      boatMove(s) -> 
 
 %Gate subcontroller process
 %1) setGateOpen(GateID
 
 %Gate_Controller_proc
 % If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through 
-GCp = sum cmd:M2G.g_recFromMaster(cmd).(
+GCp = sum cmd:M2G.m_sendToGate(cmd).(
 	%if a isSetGateOpen happens (is true), it means that setGateOpen(GateID_none) was sent. We loop through them and checks which parameter was inputed (G0n, G1n or G_none)
 	(isSetGateOpen(cmd)) -> sum Gvar_none:GateID_none.setGateOpen(Gvar_none)).(
 	%Close any door that is open!	
@@ -131,5 +138,5 @@ Gate1_open = closeGate(G1);
 %--------------------------------------
 %All gates are closed, all lights indicate Halt, valve V0 is open and valve V1 is closed.
 init
-%m_sendToGate(setGateOpen(G0n));
+MC(idle);
 
