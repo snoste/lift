@@ -88,25 +88,28 @@ proc
 %Gate subcontroller process
 %1) setGateOpen(GateID
 
-%Gate_Controller_proc 
-GCp = sum Gvar_none:GateID_none.g_recFromMaster(setGateOpen(Gvar_none)).(
+%Gate_Controller_proc
+% If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through 
+GCp = sum cmd:M2G.g_recFromMaster(cmd).(
+	%if a isSetGateOpen happens (is true), it means that setGateOpen(GateID_none) was sent. We loop through them and checks which parameter was inputed (G0n, G1n or G_none)
+	(isSetGateOpen(cmd)) -> sum Gvar_none:GateID_none.setGateOpen(Gvar_none)).(
 	%Close any door that is open!	
 	(Gvar_none == G_none) ->  
 		%Check if either gate is open and close them if they are, and send a gateReady to Master after closing. And if both are closed then send a gateReady back to Master
 		(((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GCp) <> 
-			((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GCp) <> sendToMaster(gateReady).GCp)))
-	%	
-	+((Gvar_none == G0n) -> 
-		((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp)))
-	%
-	+((Gvar_none == G1n) -> 
+			((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GCp) <> sendToMaster(gateReady).GCp)))+
+	%If the master wants to open the GO gate it sends a G0n and it checks if it is already closed and sends the Gate0_open if it is closed otherwise send an error.	
+	((Gvar_none == G0n) -> 
+		((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp)))+
+	%If the master wants to open the G1 gate it sends a G1n and it checks if it is already closed and sends the Gate1_open if it is closed otherwise send an error.	
+	((Gvar_none == G1n) -> 
 		((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp))));
 
-%Loop until a ship is not inbetween the gate and then close it
+%Loop until a ship is not inbetween the gate and then close it (Remeber that this ship was instructed to start entering the sluic and should therefore be on its way already)
 Gate0_close = (gateSensor(G0)==false) -> closeGate(G0) <> Gate0_close; 
 Gate1_close = (gateSensor(G1)==false) -> closeGate(G1) <> Gate1_close;
 
-%Do we really need to check if the waterlevel has changed as the master checks it and only opens a gate if it is safe
+%Do we really need to check if the waterlevel has changed as the master checks it and only opens a gate if it is safe. Those parameters are done by the valve subprocessor and after which the master will get here and 
 Gate0_open = closeGate(G0);
 Gate1_open = closeGate(G1);
 
@@ -128,5 +131,5 @@ Gate1_open = closeGate(G1);
 %--------------------------------------
 %All gates are closed, all lights indicate Halt, valve V0 is open and valve V1 is closed.
 init
-m_sendToGate(setGateOpen(G0));
+%m_sendToGate(setGateOpen(G0n));
 
