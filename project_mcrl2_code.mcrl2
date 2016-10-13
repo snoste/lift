@@ -4,7 +4,8 @@ sort
 
 % States of the system
 state =  struct idle ? isIdle |
-               boatMoving ? isBoatMoving |
+               boatMovingDown ? isBoatMovingDown |
+               boatMovingUP ? isBoatMovingUp |
                boatLifting ? isBoatLifting;
 
 
@@ -15,7 +16,7 @@ ValveID = struct V0 | V1;
 SLID = struct S00 | S01 | S10 | S11 | S_none;
 
 LevelID = struct L0 | L1;
-PositionID = struct P00 | P01 | P10 | P11;
+PositionID = struct P00 | P01 | P10 | P11 | P_none;
 
 % Sub controllers
 
@@ -86,14 +87,18 @@ proc
 % States of the system
 %state =  struct idle ? isIdle |
 %               boatMoving ? isBoatMoving |
+%
 %               boatLifting ? isBoatLifting;
-MC(s:state,) = isIdle(s) -> sum init_pos:P00,P10.getPresence(init_pos).(
-				(init_pos == P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(openGate(G0n)).m_sendToSignal(setSignalPass(S00)).MC(boatMove) +
-				(init_pos == P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(openGate(G1n)).m_sendToSignal(setSignalPass(S10)).MC(boatMove) <> MC(idle))+
-	      boatMove(s) -> 
+MasterController(s:state) = 
+	 isIdle(s) -> sum init_pos:(P00,P10).shipPresence(init_pos).(
+		 (init_pos == P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(openGate(G0n)).m_sendToSignal(setSignalPass(S00)).MasterConctroller(boatMoveUp)
+		+(init_pos == P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(openGate(G1n)).m_sendToSignal(setSignalPass(S10)).MasterConctroller(boatMoveDown) <> MC(idle))
+	+isBoatMoveUp(s) -> (shipPresence(P01) -> m_sendToGate(G_none).)
 
-%Gate subcontroller process
-%1) setGateOpen(GateID
+
+
+
+
 
 %Gate_Controller_proc
 % If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through 
@@ -121,6 +126,8 @@ Gate1_close = (gateSensor(G1)==false) -> closeGate(G1) <> Gate1_close;
 Gate0_open = closeGate(G0);
 Gate1_open = closeGate(G1);
 
+
+
 %Signal subcontroller process
 SignalCOntroller = sum receive:M2S.m_sendToSignal(receive).(
 					isSetSignalPass(SLID)(receive) -> sum Svar:SLID.setSignalPass(Svar)).(
@@ -131,6 +138,8 @@ SignalCOntroller = sum receive:M2S.m_sendToSignal(receive).(
 														).s_sendToMaster(signalReady)
 							    )<>SignalController;
 switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
+
+
 
 %Valve subcontroller process
 ValveController = sum receive:M2V.v_receiveFromMaster(receive).(
