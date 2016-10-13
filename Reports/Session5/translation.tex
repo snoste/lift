@@ -1,79 +1,96 @@
 \section{Translation of the Requirements into Interaction}
+
+\subsubsection*{Safety}
 \begin{enumerate}
-	\item Only one gate can be open at a time	
-	\begin{itemize}
-		\item An openGate(0) action cannot be followed by an openGate(1) action unless a closeGate(0) action happened in between.
-		\item An openGate(1) action cannot be followed by an openGate(0) action unless a closeGate(1) action happened in between.
-		
-	\end{itemize}
+	\item Only one gate can be open at a time
+		\begin{itemize}
+			\item It is only possible to send an openGate(gateID$_i$) to open gate $i$ after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$
+		\end{itemize}
 	
-	\item Only one valve can be open at a time	
-	\begin{itemize}
-		\item An openValve(0) action cannot be followed by an openValve(1) action unless a closeValve(0) action happened in between.
-		\item An openValve(1) action cannot be followed by an openValve(0) action unless a closeValve(1) action happened in between.
-	\end{itemize}
+	\item Only one valve can be open at a time
+		\begin{itemize}
+			\item It is only possible to send an openValve(valveID$_i$) to open valve $i$ after a valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$
+		\end{itemize}
 	
 	\item A valve and a gate at different levels can never be open at the same time
-	\begin{itemize}
-		\item An openValve(0) action is not allowed after an openGate(1) action, and visa versa.
-		\item An openValve(1) action is not allowed after an openGate(0) action, and visa versa.
-	\end{itemize}
+		\begin{itemize}
+			\item It is only possible to send an openGate(gateID$_i$) to open gate $i$ after a valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for gate $i$ and valve $j$ are on opposite sides of the lift 
+			\item It is only possible to send an openValve(valveID$_i$) to open valve $i$ after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for valve $i$ and gate $j$ are on opposite sides of the lift
+		\end{itemize}
+	
+	%\item After a ship has entered the sluice the gate will close
+	%\begin{itemize}
+	%	\item it is not possible to send closeGate(gate\_ID) if getShipPresence(pos\_(same(ID).1),false)	
+	%\end{itemize}
 	
 	\item A gate can only close if there is no ship in between its doors
 	\begin{itemize}
-		\item A closeGate(gateID) can only be done after gateSensor(gateID, false)
+		\item It is not possible to send closeGate(gateID$_i$) to close gate $i$ unless gateSensor(gateID$_i$, $\mathbb{B}$) returns $\mathbb{B} = false$ and no other action has been issued in the meantime
 	\end{itemize}
 	
 	\item A gate can only open if the water level on both sides is equal
 	\begin{itemize}
-		\item An openGate(1) action can only be done after compareWaterlevel(1.0, true)
-		\item An openGate(0) action can only be done after compareWaterlevel(0.0, true)
+		\item It is not possible to send openGate(gateID$_i$) to open gate $i$ unless compareWaterlevel(containerID$_j$, $\mathbb{B}$) returns $\mathbb{B} = true$ and no other action has been issued in the meantime, for gate $i$ and container $j$ are on the same side of the lift
 	\end{itemize}
-	\item The signal can never be off nor indicate hold and pass at the same time
+	
+	\item Signal lights can never be off nor indicate hold and pass at the same time
 		\begin{itemize}
-			\item passSignal(SignalID, true) has to be followed directly by a haltSignal(SignalID, false)
-			\item haltSignal(SignalID, true) has to be followed directly by a passSignal(SignalID, false)
-			\item passSignal(SignalID, false) can only be issued directly after haltSignal(SignalID, true)
-			\item haltSignal(SignalID, false) can only be issued directly after passSignal(SignalID, true)
+			\item passSignal(signalID$_i$, true) has to be followed directly by a haltSignal(signalID$_i$, false)
+			\item haltSignal(signalID$_i$, true) has to be followed directly by a passSignal(signalID$_i$, false)
+			\item passSignal(signalID$_i$, false) can only be issued directly after haltSignal(signalID$_i$, true)
+			\item haltSignal(signalID$_i$, false) can only be issued directly after passSignal(signalID$_i$, true)
 		\end{itemize}
-		\item The signal can only indicate pass if the gate is completely opened
+	\item Signal lights can only indicate pass if the gate is completely opened
 		\begin{itemize}
-			\item A passSignal(0.0, true) or passSignal(0.1, true) action can not be done after an openGate(0) action when gateState(0, false)
-			\item A passSignal(1.0, true) or passSignal(1.1, true) action can not be done after an openGate(1) action when gateState(1, false)
+			\item It is only possible to send a passSignal(signalID$_i$, true) to set signal $i$ to pass after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift
 		\end{itemize}
-		\item The entering signal can only indicate pass if there is no ship in the lift already
+	\item An entering signal can only indicate pass if there is no ship in the lift already
 		\begin{itemize}
-			\item if shipPresence(0.1, true) or shipPresence(1.1,true) it is not possible to do a passSignal(0.0, true) or passSignal(1.0) action 
+			\item It is only possible to send a passSignal(signalID$_i$, true) to set signal $i$ to pass after shipPresence(posID, $\mathbb{B}$) delivers $\mathbb{B} = false$ for posID = (ID of container X.1)
 		\end{itemize}
-	\end{enumerate}
+\end{enumerate}
 
 \subsubsection*{Functionality}
 \begin{enumerate}
-	\item If the system is in idle the first ship to arrive at a signal light should get served first
-	\begin{itemize}
-		\item if every gateState(gateID, false), compareWaterlevel(0.0, true) and shipPresence(0.0, true), an openGate(0) action will be done, after eventually an openGate(1) action will follow.
-		\item if every gateState(gateID, false), compareWaterlevel(0.0, false) and shipPresence(0.0, true), an openValve(0) action will be done, after eventually an openGate(1) action will follow.
-		\item if every gateState(gateID, false), compareWaterlevel(1.0, true) and shipPresence(1.0, true), an openGate(1) action will be done after eventually an openGate(0) action will follow.
-		\item if every gateState(gateID, false), compareWaterlevel(1.0, false) and shipPresence(1.0, true), an openValve(1) action will be done, after eventually an openGate(0) action will follow.
-	\end{itemize}
-	\item If the system is not in idle state, a ship is leaving the system and there
-	\begin{enumerate}
-		\item is no other boat waiting, the system should enter idle state
+	\item If there is no ship in the lift
 		\begin{itemize}
-			\item if every shipPresence(posID, false) do a haltSignal(signalID, true) for every signalID, a passSignal(signalID, false) for every signalID, followed by a closeGate(0) and closeGate(1) action.
+			\item While the system is idle, it should check for arriving ships periodically using the shipPresence(posID$_i$, $\mathbb{B}$) action for all position IDs posID$_i$. If $\mathbb{B} = true$ for one position posID$_i \neq X.1$, the system should issue signalPass(signalID$_i$, true) where signalID$_i$ is the entering signal light at position posID$_i$
 		\end{itemize}
-		\item are boats waiting on one side of the lift, the first boat in line gets served
+		
+	\item If a ship has just left the system and there is no other boat waiting, the system should enter idle state
+			\begin{itemize}
+				\item If shipPresence(posID$_i$, $\mathbb{B}$) returns $\mathbb{B} = false$ for all position IDs posID$_i$:
+				\begin{itemize}
+					\item For all gate IDs gateID$_i$: If gateState(gateID$_i$, $\mathbb{B}$) returns $\mathbb{B} = true$, closeGate(gateID$_i$) must be issued
+					\item For all signal IDs signalID$_i$: If signalState(signalID$_i$, $\mathbb{B}$) returns $\mathbb{B} = true$, haltSignal(signalID$_i$, true) must be issued
+					\item Otherwise no action must happen
+				\end{itemize}
+			\end{itemize}
+		\item If a ship has just left the system and there are boats waiting on one side of the lift, the first boat in line gets served 
+			\begin{itemize}
+				\item If shipPresence(posID$_i$, $\mathbb{B}$) returns $\mathbb{B} = true$ for one position posID$_i \neq X.1$, the system should issue signalPass(signalID$_i$, true) where signalID$_i$ is the entering signal light at position posID$_i$
+			\end{itemize}
+		\item If a ship has just left the system and there are boats waiting on both sides of the lift, then the first boat on the current level gets served
+			\begin{itemize}
+				\item If both, shipPresence(posID$_i$, $\mathbb{B}$) and shipPresence(posID$_j$, $\mathbb{B}$) return $\mathbb{B} = true$ for posID$_i \neq$ posID$_j \neq$ posID$_{X.1}$, the system should check the current waterlevel in container X.1 using compareWaterlevel(containerID$_i$, $\mathbb{B}_i$) and compareWaterlevel(containerID$_j$, $\mathbb{B}_j$) (containerID$_i \neq$ containerID$_j \neq$ containerID$_{X.1}$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the entering signal light at container $k$ and
+				\begin{equation*}
+					k = 
+					\begin{cases}
+						i & \text{if } \mathbb{B}_i = true\\
+						j & \text{if } \mathbb{B}_j = true\\
+					\end{cases}
+				\end{equation*}
+			\end{itemize}
+	
+	\item If a ship hast just entered the lift the system should transport the ship to the other level
 		\begin{itemize}
-			\item if only shipPresence(0.0, true), compareWaterlevel(0.0, true), gateState(0, true), a passSignal(0.0) action will be done, after eventually an openGate(1) action will follow.
-			\item if only shipPresence(0.0, true), compareWaterlevel(0.0, false), a closeGate(1) action will be done, followed by an openValve(0) action, an openGate(0) action and eventually by an openGate(1) action.
-			\item if only shipPresence(1.0, true), compareWaterlevel(1.0, true), gateState(1, true), a passSignal(1.0) action will be done, after eventually an openGate(0) action will follow.
-			\item if only shipPresence(1.0, true), compareWaterlevel(1.0, false), a closeGate(0) action will be done, followed by an openValve(1) action, an openGate(1) action and eventually by an openGate(0) action.
-		\end{itemize} 
-		\item are boats waiting on both sides of the lift, then the first boat on the current level gets served
-		\begin{itemize}
-			\item if shipPresence(0.0, true), shipPresence(1.0, true), compareWaterlevel0.0, true), an passSignal(0.0,true) action will be done after eventually an openGate(1) action will follow.
-			\item if shipPresence(0.0, true), shipPresence(1.0, true), compareWaterlevel1.0, true), an passSignal(1.0,true) action will be done after eventually an openGate(0) action will follow.
+			\item Once a ship has entered the system (shipPresence(posID$_{X.1}$, $\mathbb{B}$) results in $\mathbb{B} = true$ for the first time after resulting in $\mathbb{B} = false$), it should check the current waterlevel in container X.1 using compareWaterlevel(containerID$_i$, $\mathbb{B}_i$) and compareWaterlevel(containerID$_j$, $\mathbb{B}_j$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the leaving signal light at container $k$ and
+			\begin{equation*}
+				k = 
+				\begin{cases}
+					i & \text{if } \mathbb{B}_i = true\\
+					j & \text{if } \mathbb{B}_j = true\\
+				\end{cases}
+			\end{equation*}
 		\end{itemize}
 	\end{enumerate}
-\end{enumerate}
-
