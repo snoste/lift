@@ -1,0 +1,159 @@
+%--------------------------------------
+% The sort
+sort
+
+% States of the system
+state =  struct idle ? isIdle |
+               boatMoving ? isBoatMoving |
+               boatLifting ? isBoatLifting;
+
+
+%General components and their states
+GateID_none = struct G0n | G1n | G_none;
+GateID = struct G0 | G1;
+ValveID = struct V0 | V1;
+SLID = struct S00 | S01 | S10 | S11 | S_none;
+
+LevelID = struct L0 | L1;
+PositionID = struct P00 | P01 | P10 | P11;
+
+% Sub controllers
+
+%Gate to master and master to gate
+M2G = struct	setGateOpen ? isSetGateOpen;
+G2M = struct	gateReady ? isGateReady |
+		gateError ? isGateError;
+
+%signal to master and master to signal
+M2S = struct	setSignalPass ? isSignalSetPass;
+S2M = struct	signalReady ? isSignalReady |
+		signalError ? isSignalError;
+
+%Valve to master and master to valve
+M2V = struct	setWaterLevel ? issetWaterLevel;
+V2M = struct 	valveReady ? isValveReady |
+                valveError ? isValveError;
+
+%--------------------------------------
+% Mapping the positions and moving between the
+%map
+%boatMove : Position -> Position;
+
+
+%--------------------------------------
+%eqn
+
+
+%--------------------------------------
+act
+%Master Controller actions
+shipPresence: PositionID -> Bool;
+setGateOpen: GateID_none; 
+isSetGateOpen: Bool;
+setSignalPass: SLID;
+setWaterLevel: LevelID;
+
+gateReady, gateError, signalReady, signalError, valveReady, valveError;
+isGateReady, isGateError, isSignalReady, isSignalError, isValveReady, isValveError: Bool;
+
+
+
+%Gate subcontroller actions
+openGate, closeGate: GateID;
+gateState, gateSensor: GateID -> Bool;
+
+%Signal subcontroller actions
+haltSignal, passSignal: SLID;
+signalState: SLID -> Bool;
+
+%Valve subcontroller actions
+openValve, closeValve: ValveID;
+waterFlowState, valveState, compareWaterLevel: GateID -> Bool;
+
+m_recFromGate, m_sendToGate : M2G;
+g_recFromMaster, g_sendToMaster : G2M; 
+
+m_recFromSignal, m_sendToSignal : M2S;
+s_recFromMaster, s_sendToMaster : S2M;
+
+m_recFromValve, m_sendToValve : M2V;
+v_recFromMaster, v_sendToMaster : V2M;
+
+%--------------------------------------
+proc
+
+%Master Controller process
+% States of the system
+%state =  struct idle ? isIdle |
+%               boatMoving ? isBoatMoving |
+%               boatLifting ? isBoatLifting;
+MC(s:state,) = isIdle(s) -> sum init_pos:P00,P10.getPresence(init_pos).(
+				(init_pos == P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(openGate(G0n)).m_sendToSignal(setSignalPass(S00)).MC(boatMove) +
+				(init_pos == P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(openGate(G1n)).m_sendToSignal(setSignalPass(S10)).MC(boatMove) <> MC(idle))+
+	      boatMove(s) -> 
+
+%Gate subcontroller process
+%1) setGateOpen(GateID
+
+%Gate_Controller_proc
+% If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through 
+GCp = sum cmd:M2G.m_sendToGate(cmd).(
+	%if a isSetGateOpen happens (is true), it means that setGateOpen(GateID_none) was sent. We loop through them and checks which parameter was inputed (G0n, G1n or G_none)
+	(isSetGateOpen(cmd)) -> sum Gvar_none:GateID_none.setGateOpen(Gvar_none)).(
+	%Close any door that is open!	
+	(Gvar_none == G_none) ->  
+		%Check if either gate is open and close them if they are, and send a gateReady to Master after closing. And if both are closed then send a gateReady back to Master
+		(((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GCp) <> 
+			((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GCp) <> sendToMaster(gateReady).GCp)))+
+	%If the master wants to open the GO gate it sends a G0n and it checks if it is already closed and sends the Gate0_open if it is closed otherwise send an error.	
+	((Gvar_none == G0n) -> 
+		((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp)))+
+	%If the master wants to open the G1 gate it sends a G1n and it checks if it is already closed and sends the Gate1_open if it is closed otherwise send an error.	
+	((Gvar_none == G1n) -> 
+		((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GCp) <> (g_sendToMaster(error).GCp))));
+
+%Loop until a ship is not inbetween the gate and then close it (Remeber that this ship was instructed to start entering the sluic and should therefore be on its way already)
+Gate0_close = (gateSensor(G0)==false) -> closeGate(G0) <> Gate0_close; 
+Gate1_close = (gateSensor(G1)==false) -> closeGate(G1) <> Gate1_close;
+
+%Do we really need to check if the waterlevel has changed as the master checks it and only opens a gate if it is safe. Those parameters are done by the valve subprocessor and after which the master will get here and 
+Gate0_open = closeGate(G0);
+Gate1_open = closeGate(G1);
+
+%Signal subcontroller process
+
+%Valve subcontroller process
+ValveController = sum receive:M2V.m_sendToValve(receive).(
+				%check if message from master is received
+							     %close valve v1 in case we want to open v1   %check water level end send if everithink ok a valve ready message, otherwise error message
+				isSetWaterLevel(receive)-> ((receive==(V0)-> closeValve(V1).openValve(V0).compareWaterLevel(G0) -> (v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
+							 )<> receive==(V1)-> closeValve(V0).openValve(V1).compareWaterLevel(G1) -> (v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
+					%if no message, rexecute the cycle
+					) <> ValveController;
+
+
+%0) wait
+
+%1) If (Boat at initial position P00) and !boatEntered then setPass(S00) else wait
+
+
+%1.1) If 
+
+
+%2) If (Boat at initial position P11) and !boatEntered then setPass(S11)
+	
+%--------------------------------------
+%All gates are closed, all lights indicate Halt, valve V0 is open and valve V1 is closed.
+init
+MC(idle);
+
+%set parallel action
+comm(
+	m_recFromGate | g_sendToMaster ->;%something
+	g_recFromMaster | m_sendToGate ;
+	m_recFromSignal |  m_sendToSignal ;
+	s_recFromMaster |  m_sendToSignal ;
+	m_recFromValve | v_sendToMaster ;
+	v_recFromMaster | m_sendToValve ;
+	)
+
