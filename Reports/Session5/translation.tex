@@ -45,7 +45,7 @@
 		\end{itemize}
 	\item An entering signal can only indicate pass if there is no ship in the lift already
 		\begin{itemize}
-			\item It is only possible to send passSignal(signalID$_i$, true) to set signal $i$ to pass after shipPresence(posID$_{X.1}$, $\mathbb{B}$) delivers $\mathbb{B} = false$ for posID$_{X.1}$ is the ID of container X.1
+			\item It is only possible to send passSignal(signalID$_i$, true) to set the entering signal $i$ to pass after shipPresence(posID$_{X.1}$, $\mathbb{B}$) delivers $\mathbb{B} = false$ and no other action has been issued in the meantime, for posID$_{X.1}$ is the ID of container X.1
 		\end{itemize}
 \end{enumerate}
 
