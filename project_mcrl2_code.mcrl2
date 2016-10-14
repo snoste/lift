@@ -88,14 +88,14 @@ proc
 %
 %               boatLifting ? isBoatLifting;
 MasterController(s:state) = 
-	 isIdle(s) -> sum init_pos:(P00,P10).shipPresence(init_pos).(
-		 (init_pos == P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(openGate(G0n)).m_sendToSignal(setSignalPass(S00)).MasterConctroller(boatMoveUp)
-		+(init_pos == P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(openGate(G1n)).m_sendToSignal(setSignalPass(S10)).MasterConctroller(boatMoveDown) <> MC(idle))
-	+isBoatMoveUp(s) -> (shipPresence(P01) -> m_sendToGate(G_none).m_sendToValve(setWaterLevel(L0)) )
-
-
-
-
+	(isIdle(s) -> 
+	(
+		(shipPresence(P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(setGateOpen(G0n)).m_sendToSignal(setSignalPass(S00)).MasterConctroller(boatMoveUp))
+		+(shipPresence(P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(setGateOpen(G1n)).m_sendToSignal(setSignalPass(S10)).MasterConctroller(boatMoveDown) <> MC(idle))
+	))
+	% If boat is moving Up/Down the controller waits until the ship has arrived inside the gate, else keep waiting, then change the waterlevel then open the gate on same floor and set the corresponding light to pass. Then close the ship after the ship has left 
+	+(isBoatMoveDown(s) -> (shipPresence(P10) -> (m_sendToGate(setGateOpen(G_none)).m_sendToValve(setWaterLevel(L0)).m_sendToGate(setGateOpen(G0n)).m_sendToSignal(setSignalPass(S01))) <> MasterController(boatMoveUp)))
+	+(isBoatMoveUp(s) -> (shipPresence(P00) -> m_sendToGate(setGateOpen(G_none)).m_sendToValve(setWaterLevel(L1)).m_sendToGate(setGateOpen(G1n)).m_sendToSignal(setSignalPass(S11))) <> MasterController(boatMoveDown)));
 
 
 %Gate_Controller_proc
