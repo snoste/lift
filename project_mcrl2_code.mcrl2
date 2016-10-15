@@ -104,17 +104,18 @@ MasterController(s:state) =
 % If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through
 GateController = sum receive:M2G.g_recFromMaster(receive).(
 	%if a isSetGateOpen happens (is true), it means that setGateOpen(GateID_none) was sent. We loop through them and checks which parameter was inputed (G0n, G1n or G_none)
-	(isSetGateOpen(GateID)(receive)) -> sum Gvar_none:GateID_none.setGateOpen(Gvar_none)).(
+	(isSetGateOpen(receive)) -> (sum Gvar_none:GateID_none.setGateOpen(Gvar_none).(
 	%Close any door that is open!
 	(Gvar_none == G_none) -> (
 		%Check if either gate is open and close them if they are, and send a gateReady to Master after closing. And if both are closed then send a gateReady back to Master
-		(((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GateController) <>
-			((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GateController) <> sendToMaster(gateReady).GateController)))+
-	%If the master wants to open the GO gate it sends a G0n and it checks if it is already closed and sends the Gate0_open if it is closed otherwise send an error.
-	((Gvar_none == G0n) ->
-		((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController)))+
-	%If the master wants to open the G1 gate it sends a G1n and it checks if it is already closed and sends the Gate1_open if it is closed otherwise send an error.
-	((Gvar_none == G1n) -> ((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController)))<> GateController));
+		((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GateController) <> sendToMaster(gateReady).GateController)+
+		((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GateController) <> sendToMaster(gateReady).GateController))+
+	%If the master wants to open the GO gate it sends a G0n and it checks if it is already closed and sends the Gate0_open if it is closed then ready signalReady otherwise send an error.
+	(Gvar_none == G0n) -> ((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))<> g_sendToMaster(gateReady)+
+	%If the master wants to open the G1 gate it sends a G1n and it checks if it is already closed and sends the Gate1_open if it is closed then ready signalReady otherwise send an error.
+	(Gvar_none == G1n) -> ((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))<> g_sendToMaster(gateReady)))
+
+  <> GateController);
 
 %Loop until a ship is not inbetween the gate and then close it (Remeber that this ship was instructed to start entering the sluic and should therefore be on its way already)
 Gate0_close = (gateSensor(G0)==false) -> closeGate(G0) <> Gate0_close;
@@ -126,17 +127,19 @@ Gate1_open = closeGate(G1);
 
 
 
+
 %Signal subcontroller process
-SignalCOntroller = sum receive:M2S.m_sendToSignal(receive).(
-	isSetSignalPass(SLID)(receive) -> sum Svar:SLID.setSignalPass(Svar)).
+%Check if recieved a signal from the master. If so, check which Signal to setPass, turn all other off and then the selected signal pass.
+SignalCOntroller = sum receive:M2S.s_receiveFromMaster(receive).(
+	isSetSignalPass(receive) -> (sum Svar:SLID.setSignalPass(Svar).
 		(
-		(Svar==S00)->switchoffAll.passSignal(S00)
+		((Svar==S00)->switchoffAll.passSignal(S00)
 		+(Svar==S10)->switchoffAll.passSignal(S10)
 		+(Svar==S01)->switchoffAll.passSignal(S01)
 		+(Svar==S11)->switchoffAll.passSignal(S11)
 		).s_sendToMaster(signalReady)
-		)
-		<>SignalController;
+		))
+		<>SignalController);
 
 switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
 
@@ -144,12 +147,13 @@ switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
 
 %Valve subcontroller process
 ValveController = sum receive:M2V.v_receiveFromMaster(receive).(
-				%check if message from master is received
-							     %close valve v1 in case we want to open v1   %check water level end send if everithink ok a valve ready message, otherwise error message
-				(isSetWaterLevel(ValveID)(receive))-> ((receive==SetWaterLevel(L0)-> closeValve(V1).openValve(V0).compareWaterLevel(G0) -> (v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
-							 )<> receive==SetWaterLevel(L1)-> closeValve(V0).openValve(V1).compareWaterLevel(G1) -> (v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
-					%if no message, rexecute the cycle
-					) <> ValveController;
+				%check if message from master is received %close valve v1 in case we want to open v1  %check water level end send if everithink ok a valve ready message, otherwise error message
+isSetWaterLevel(receive) ->
+  ((receive==SetWaterLevel(L0)) -> (closeValve(V1).openValve(V0).compareWaterLevel(G0) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
+							 ))+
+  ((receive==SetWaterLevel(L1)) -> (closeValve(V0).openValve(V1).compareWaterLevel(G1) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
+					%if no message, re-execute the cycle
+					) <> ValveController));
 
 
 %0) wait
@@ -167,7 +171,7 @@ ValveController = sum receive:M2V.v_receiveFromMaster(receive).(
 init
 MC(idle);
 
-%set parallel action
+%set parallel actions
 comm(
 	m_recFromGate | g_sendToMaster ->;%something
 	g_recFromMaster | m_sendToGate ;
@@ -175,4 +179,4 @@ comm(
 	s_recFromMaster |  m_sendToSignal ;
 	m_recFromValve | v_sendToMaster ;
 	v_recFromMaster | m_sendToValve ;
-	)
+	);
