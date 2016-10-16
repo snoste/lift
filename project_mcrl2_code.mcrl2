@@ -69,14 +69,14 @@ signalState: SLID -> Bool;
 openValve, closeValve: ValveID;
 waterFlowState, valveState, compareWaterLevel: GateID -> Bool;
 
-g_recFromMaster, m_sendToGate : M2G;
-m_recFromGate, g_sendToMaster : G2M;
+g_recFromMaster, m_sendToGate, communicationG_M : M2G;
+m_recFromGate, g_sendToMaster, communicationM_G : G2M;
 
-s_recFromMaster, m_sendToSignal : M2S;
-m_recFromSignal, s_sendToMaster : S2M;
+s_recFromMaster, m_sendToSignal, communicationM_S : M2S;
+m_recFromSignal, s_sendToMaster, communicationS_M : S2M;
 
-v_recFromMaster, m_sendToValve : M2V;
-m_recFromValve, v_sendToMaster : V2M;
+v_recFromMaster, m_sendToValve, communicationM_V : M2V;
+m_recFromValve, v_sendToMaster, communicationV_M : V2M;
 
 %--------------------------------------
 proc
@@ -90,8 +90,8 @@ proc
 MasterController(s:state) =
 	(isIdle(s) ->
 	(
-		(shipPresence(P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(setGateOpen(G0n)).m_sendToSignal(setSignalPass(S00)).MasterConctroller(boatMoveUp))
-		+(shipPresence(P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(setGateOpen(G1n)).m_sendToSignal(setSignalPass(S10)).MasterConctroller(boatMoveDown) <> MC(idle))
+		(shipPresence(P00) -> m_sendToValve(setWaterLevel(L0)).m_sendToGate(setGateOpen(G0n)).m_sendToSignal(setSignalPass(S00)).MasterController(boatMoveUp))
+		+(shipPresence(P10) -> m_sendToValve(setWaterLevel(L1)).m_sendToGate(setGateOpen(G1n)).m_sendToSignal(setSignalPass(S10)).MasterController(boatMoveDown) <> MC(idle))
 	))
 	% If boat is moving Up/Down the controller waits until the ship has arrived inside the gate, else keep waiting, then change the waterlevel then open the gate on same floor and set the corresponding light to pass. Then close the ship after the ship has left
 	+(isBoatMoveDown(s) -> (shipPresence(P10) ->
@@ -130,7 +130,7 @@ Gate1_open = closeGate(G1);
 
 %Signal subcontroller process
 %Check if recieved a signal from the master. If so, check which Signal to setPass, turn all other off and then the selected signal pass.
-SignalCOntroller = sum receive:M2S.s_receiveFromMaster(receive).(
+SignalController = sum receive:M2S.s_receiveFromMaster(receive).(
 	isSetSignalPass(receive) -> (sum Svar:SLID.setSignalPass(Svar).
 		(
 		((Svar==S00)->switchoffAll.passSignal(S00)
@@ -169,14 +169,18 @@ isSetWaterLevel(receive) ->
 %--------------------------------------
 %All gates are closed, all lights indicate Halt, valve V0 is open and valve V1 is closed.
 init
-MC(idle);
+% How this works: hide({someCommands}, allow({all actions!!!},comm({parallelCommunication},)))
+hide ({communicationM_G, communicationG_M, communicationM_V, communicationV_M, communicationM_S, communicationS_M},
 
+allow({ALL ACTIONS},
 %set parallel actions
 comm(
-	m_recFromGate | g_sendToMaster ->;%something
-	g_recFromMaster | m_sendToGate ;
-	m_recFromSignal |  m_sendToSignal ;
-	s_recFromMaster |  m_sendToSignal ;
-	m_recFromValve | v_sendToMaster ;
-	v_recFromMaster | m_sendToValve ;
-	);
+	{m_recFromGate | g_sendToMaster -> communicationM_G,%something
+	g_recFromMaster | m_sendToGate -> ,
+	m_recFromSignal |  m_sendToSignal ,
+	s_recFromMaster |  m_sendToSignal ,
+	m_recFromValve | v_sendToMaster ,
+	v_recFromMaster | m_sendToValve },
+
+
+  MasterController(idle) || ValveController || GateController || SignalController))) ;
