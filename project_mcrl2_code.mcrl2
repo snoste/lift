@@ -31,7 +31,7 @@ S2M = struct	signalReady ? isSignalReady |
 		signalError ? isSignalError;
 
 %Valve to master and master to valve
-M2V = struct	setWaterLevel(LevelID) ? issetWaterLevel;
+M2V = struct	setWaterLevel(LevelID) ? isSetWaterLevel;
 V2M = struct 	valveReady ? isValveReady |
                 valveError ? isValveError;
 
@@ -149,9 +149,9 @@ switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
 ValveController = sum receive:M2V.v_receiveFromMaster(receive).(
 				%check if message from master is received %close valve v1 in case we want to open v1  %check water level end send if everithink ok a valve ready message, otherwise error message
 isSetWaterLevel(receive) ->
-  ((receive==SetWaterLevel(L0)) -> (closeValve(V1).openValve(V0).compareWaterLevel(G0) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
+  ((receive==setWaterLevel(L0)) -> (closeValve(V1).openValve(V0).(compareWaterLevel(G0)) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
 							 ))+
-  ((receive==SetWaterLevel(L1)) -> (closeValve(V0).openValve(V1).compareWaterLevel(G1) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
+  ((receive==setWaterLevel(L1)) -> (closeValve(V0).openValve(V1).(compareWaterLevel(G1)) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
 					%if no message, re-execute the cycle
 					) <> ValveController));
 
