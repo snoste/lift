@@ -172,15 +172,16 @@ init
 % How this works: hide({someCommands}, allow({all actions!!!},comm({parallelCommunication},)))
 hide ({communicationM_G, communicationG_M, communicationM_V, communicationV_M, communicationM_S, communicationS_M},
 
-allow({ALL ACTIONS},
+allow({shipPresence,setGateOpen,isSetGateOpen,setSignalPass, setWaterLevel, gateReady, gateError, signalReady, signalError, valveReady, valveError, isGateReady, isGateError, isSignalReady, isSignalError, isValveReady, isValveError,
+openGate, closeGate, gateState, gateSensor, haltSignal, passSignal,signalState, openValve, closeValve,communicationG_M,communicationM_G,communicationM_S,communicationS_M,communicationM_V,communicationV_M},
 %set parallel actions
 comm(
-	{m_recFromGate | g_sendToMaster -> communicationM_G,%something
-	g_recFromMaster | m_sendToGate -> ,
-	m_recFromSignal |  m_sendToSignal ,
-	s_recFromMaster |  m_sendToSignal ,
-	m_recFromValve | v_sendToMaster ,
-	v_recFromMaster | m_sendToValve },
+	{m_recFromGate | g_sendToMaster -> communicationG_M,
+	g_recFromMaster | m_sendToGate -> communicationM_G,
+	m_recFromSignal |  m_sendToSignal -> communicationS_M,
+	s_recFromMaster |  m_sendToSignal -> communicationM_S,
+	m_recFromValve | v_sendToMaster -> communicationV_M,
+	v_recFromMaster | m_sendToValve -> communicationM_V},
 
 
-  MasterController(idle) || ValveController || GateController || SignalController))) ;
+MasterController(idle)|| ValveController || GateController || SignalController)));
