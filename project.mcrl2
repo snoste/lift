@@ -34,7 +34,7 @@ gateSensor0, gateSensor1, gateState0, gateState1, valveState0, valveState1, wate
 haltSignal, passSignal: SLID;
 
 %goToPos00, goToPos01, goToPos11, gotToPos10;
-goToPos00,goToPos01, goToPos10, boatExit;
+goToPos00,goToPos01, goToPos10, goToPos11, boatExit;
 
 g_recFromMaster, m_sendToGate, communicationM_G : M2G;
 m_recFromGate, g_sendToMaster, communicationG_M : G2M;
@@ -48,31 +48,43 @@ m_recFromValve, v_sendToMaster, communicationV_M : V2M;
 %--------------------------------------
 proc
 MasterController(s:state) =
-(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown)) +
+(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) +
+						 goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown)) +
 (isBoatMovingUp(s) -> m_sendToSignal(setSignalPass00).goToPos01.m_sendToGate(setGateOpenNone).m_sendToValve(setWaterLevel1).m_sendToGate(setGateOpen1).
-											m_sendToSignal(setSignalPass11).boatExit.m_sendToGate(setGateOpenNone));
+											m_sendToSignal(setSignalPass11).boatExit.m_sendToGate(setGateOpenNone).MasterController(idle))+
+
+(isBoatMovingDown(s) -> m_sendToSignal(setSignalPass10).goToPos11.m_sendToGate(setGateOpenNone).m_sendToValve(setWaterLevel0).m_sendToGate(setGateOpen0).
+											m_sendToSignal(setSignalPass01).boatExit.m_sendToGate(setGateOpenNone).MasterController(idle));
 %(isBoatMovingDown(s) -> MasterController(idle));
 
 %Gate_Controller_proc
-GateController = sum receive:M2G.g_recFromMaster(receive).(
-	((isSetGateOpen0(receive) == true) -> Gate1_close.g_sendToMaster(gateReady0).GateController<>GateController)+
-	((isSetGateOpen1(receive) == true) -> Gate0_close.g_sendToMaster(gateReady1).GateController<>GateController)+
-	((isSetGateOpenNone(receive) == true) -> Gate1_close.Gate0_close.g_sendToMaster(gateNoneReady).GateController <> GateController));
+%GateController = sum receive:M2G.g_recFromMaster(receive).(
+%	((isSetGateOpen0(receive) == true) -> GateClose1.g_sendToMaster(gateReady0).GateController<>GateController)+
+%	((isSetGateOpen1(receive) == true) -> GateClose0.g_sendToMaster(gateReady1).GateController<>GateController)+
+%	((isSetGateOpenNone(receive) == true) -> GateClose1.GateClose0.g_sendToMaster(gateNoneReady).GateController <> GateController));
+%
+%GateClose1 = (sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> GateClose1));
+%GateClose0 = (sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> GateClose0));
 
-Gate1_close = sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
-Gate0_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> Gate0_close);
+GateController = sum receive:M2G.g_recFromMaster(receive).(
+	((isSetGateOpen0(receive) == true) -> GateClose1 <> GateController)+
+	((isSetGateOpen1(receive) == true) -> GateClose0 <> GateController)+
+	((isSetGateOpenNone(receive) == true) -> GateCloseAll <> GateController));
+
+GateClose1 = (sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1).g_sendToMaster(gateReady0).GateController <> GateClose1));
+GateClose0 = (sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0).g_sendToMaster(gateReady1).GateController <> GateClose0));
+GateCloseAll =  (sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1).
+								(sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> GateCloseAll)).g_sendToMaster(gateNoneReady).GateController <> GateCloseAll));
 
 %Signal Controller
 SignalController = sum receive:M2S.s_recFromMaster(receive).(
 sum receive:M2S.s_recFromMaster(receive).(
-	(isSignalSetPass00(receive) == true) -> switchoffAll.passSignal(S00)+
-	(isSignalSetPass01(receive) == true) -> switchoffAll.passSignal(S01)+
-	(isSignalSetPass11(receive) == true) -> switchoffAll.passSignal(S11)+
-	(isSignalSetPass10(receive) == true) -> switchoffAll.passSignal(S10)+
+	(isSignalSetPass00(receive) == true) -> haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S00)+
+	(isSignalSetPass01(receive) == true) -> haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S01)+
+	(isSignalSetPass11(receive) == true) -> haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S11)+
+	(isSignalSetPass10(receive) == true) -> haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S10)+
 	SignalController
 ).SignalController);
-
-switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
 
 %ValveController
 ValveController = sum receive:M2V.v_recFromMaster(receive).(
@@ -81,6 +93,8 @@ ValveController = sum receive:M2V.v_recFromMaster(receive).(
 ((isSetWaterLevel0(receive)==true) -> closeValve(V0).(sum b:Bool.valveState0(b).((b==false) -> openValve(V1)).v_sendToMaster(valveReady0)))+
 ((isSetWaterLevel1(receive)==true) -> closeValve(V1).(sum b:Bool.valveState1(b).((b==false) -> openValve(V0)).v_sendToMaster(valveReady1)))
 ).ValveController;
+
+
 %  ((prump==L0) -> closeValve(V1).openValve(V0).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))+
 %  ((prump==L1) -> closeValve(V0).openValve(V1).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))))
 %  <>ValveController);
@@ -88,7 +102,7 @@ ValveController = sum receive:M2V.v_recFromMaster(receive).(
 init
 hide ({communicationM_G, communicationG_M,communicationM_S, communicationS_M, communicationM_V, communicationV_M},
 
-allow({openGate, closeGate, gateSensor0, gateSensor1, gateState0, gateState1, goToPos00, goToPos01, goToPos10, valveState0, valveState1, waterFlowState0, waterFlowState1, communicationG_M, communicationM_G, communicationM_S, communicationS_M},
+allow({openGate, closeGate, gateSensor0, gateSensor1, gateState0, gateState1, goToPos00, goToPos01, goToPos10, goToPos11, valveState0, valveState1, waterFlowState0, waterFlowState1, communicationG_M, communicationM_G, communicationM_S, communicationS_M},
 %set parallel actions
 comm({m_recFromGate | g_sendToMaster -> communicationG_M,
 		g_recFromMaster | m_sendToGate -> communicationM_G,
@@ -97,4 +111,4 @@ comm({m_recFromGate | g_sendToMaster -> communicationG_M,
 	  m_recFromValve | v_sendToMaster -> communicationV_M,
 		v_recFromMaster | m_sendToValve -> communicationM_V},
 
-MasterController(idle) || GateController || SignalController)));
+MasterController(idle) || GateController || SignalController || ValveController)));
