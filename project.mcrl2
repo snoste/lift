@@ -1,7 +1,7 @@
 sort
-state =  struct idle ? isIdle;
+state =  struct idle ? isIdle|
 				 boatMovingDown ? isBoatMovingDown |
-				 boatMovingUP ? isBoatMovingUp ;
+				 boatMovingUp ? isBoatMovingUp ;
 
 
 %General components and their states
@@ -10,7 +10,7 @@ PositionID = struct P00 | P01 | P10 | P11 | P_none;
 
 
 %Gate to master and master to gate
-M2G = struct	setGateOpen(GateID) ? isSetGateOpen;
+M2G = struct	setGateOpen0 ? isSetGateOpen0 | setGateOpen1 ? isSetGateOpen1;
 G2M = struct	gateReady ? isGateReady |
 		          gateError ? isGateError;
 
@@ -18,14 +18,13 @@ G2M = struct	gateReady ? isGateReady |
 act
 shipPresence0:Bool;
 shipPresence1:Bool;
-moveShip00;
 
 %Gate subcontroller actions
 openGate, closeGate: GateID;
+gateSensor0, gateSensor1, gateState0, gateState1:Bool;
 
-
-goToPos00, goToPos01, goToPos11, gotToPos10;
-
+%goToPos00, goToPos01, goToPos11, gotToPos10;
+goToPos00, goToPos10;
 
 g_recFromMaster, m_sendToGate, communicationM_G : M2G;
 m_recFromGate, g_sendToMaster, communicationG_M : G2M;
@@ -36,15 +35,15 @@ proc
 
 
 MasterController(s:state) =
-(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown))+
-(isBoatMovingUp(s) -> MasterController(idle))+
-(isBoatMovingDown(s) -> MasterController(idle));
+(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown));%+
+%(isBoatMovingUp(s) -> MasterController(idle))+
+%(isBoatMovingDown(s) -> MasterController(idle));
 
 
 %Gate_Controller_proc
 GateController = sum receive:M2G.g_recFromMaster(receive).(
-	(isSetGateOpen0(receive)-> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController)+
-	(isSetGateOpen1(receive)-> Gate0_close.g_sendToMaster(gateReady).GateController<>GateController));
+	((isSetGateOpen0(receive) == true) -> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController)+
+	((isSetGateOpen1(receive) == true) -> Gate0_close.g_sendToMaster(gateReady).GateController<>GateController));
 
 Gate1_close = sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
 Gate0_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> Gate0_close);
@@ -52,7 +51,7 @@ Gate0_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> Gate
 init
 hide ({communicationM_G, communicationG_M},
 
-allow({openGate, closeGate, gateState, communicationG_M, communicationM_G},
+allow({openGate, closeGate, gateSensor0, gateSensor1, gateState0, gateState1, goToPos00, goToPos10, communicationG_M, communicationM_G},
 %set parallel actions
 comm({m_recFromGate | g_sendToMaster -> communicationG_M, g_recFromMaster | m_sendToGate -> communicationM_G},
 
