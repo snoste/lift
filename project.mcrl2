@@ -1,6 +1,7 @@
 sort
 state =  struct idle ? isIdle;
-
+				 boatMovingDown ? isBoatMovingDown |
+				 boatMovingUP ? isBoatMovingUp ;
 
 %General components and their states
 GateID = struct G0 | G1;
@@ -19,6 +20,7 @@ openGate, closeGate: GateID;
 gateState: GateID -> Bool;
 gateSensor: GateID -> Bool;
 
+goToPos00, goToPos01, goToPos11, gotToPos10;
 
 
 g_recFromMaster, m_sendToGate, communicationM_G : M2G;
@@ -30,15 +32,18 @@ proc
 
 
 MasterController(s:state) =
-(isIdle(s)->m_sendToGate(setGateOpen0).MasterController(idle));
+(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown))+
+(isBoatMovingUp(s) -> MasterController(idle))+
+(isBoatMovingDown(s) -> MasterController(idle));
 
 
 %Gate_Controller_proc
-GateController = sum receive:M2G.g_recFromMaster(receive).
-	(isSetGateOpen0(receive)-> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController);
+GateController = sum receive:M2G.g_recFromMaster(receive).(
+	(isSetGateOpen0(receive)-> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController)+
+	(isSetGateOpen1(receive)-> Gate0_close.g_sendToMaster(gateReady).GateController<>GateController));
 
 Gate1_close = sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
-
+Gate0_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> Gate0_close);
 
 init
 hide ({communicationM_G, communicationG_M},
