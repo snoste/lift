@@ -1,0 +1,50 @@
+sort
+state =  struct idle ? isIdle;
+
+
+%General components and their states
+GateID = struct G0 | G1;
+
+
+%Gate to master and master to gate
+M2G = struct	setGateOpen0 ? isSetGateOpen0 | setGateOpen1 ? isSetGateOpen1;
+G2M = struct	gateReady ? isGateReady |
+		          gateError ? isGateError;
+
+
+act
+
+%Gate subcontroller actions
+openGate, closeGate: GateID;
+gateState: GateID -> Bool;
+gateSensor0, gateSensor1 : Bool;
+
+
+
+g_recFromMaster, m_sendToGate, communicationM_G : M2G;
+m_recFromGate, g_sendToMaster, communicationG_M : G2M;
+
+
+%--------------------------------------
+proc
+
+
+MasterController(s:state) =
+(isIdle(s)->m_sendToGate(setGateOpen0).MasterController(idle));
+
+
+%Gate_Controller_proc
+GateController = sum receive:M2G.g_recFromMaster(receive).
+	(isSetGateOpen0(receive)->Gate1_close.g_sendToMaster(gateReady).GateController<>GateController);
+
+Gate1_close = closeGate(G1);
+
+
+init
+hide ({communicationM_G, communicationG_M},
+
+allow({openGate, closeGate, gateState, communicationG_M, communicationM_G},
+%set parallel actions
+comm({m_recFromGate | g_sendToMaster -> communicationG_M, g_recFromMaster | m_sendToGate -> communicationM_G},
+
+MasterController(idle) || GateController)));
