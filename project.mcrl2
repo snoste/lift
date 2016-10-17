@@ -3,8 +3,10 @@ state =  struct idle ? isIdle;
 				 boatMovingDown ? isBoatMovingDown |
 				 boatMovingUP ? isBoatMovingUp ;
 
+
 %General components and their states
 GateID = struct G0 | G1;
+PositionID = struct P00 | P01 | P10 | P11 | P_none;
 
 
 %Gate to master and master to gate
@@ -14,11 +16,13 @@ G2M = struct	gateReady ? isGateReady |
 
 
 act
+shipPresence0:Bool;
+shipPresence1:Bool;
+moveShip00;
 
 %Gate subcontroller actions
 openGate, closeGate: GateID;
-gateState: GateID -> Bool;
-gateSensor: GateID -> Bool;
+
 
 goToPos00, goToPos01, goToPos11, gotToPos10;
 
