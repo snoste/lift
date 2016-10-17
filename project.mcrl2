@@ -1,9 +1,13 @@
 sort
-state =  struct idle ? isIdle;
-
+state =  struct idle ? isIdle |
+               boatMovingDown ? isBoatMovingDown |
+               boatMovingUP ? isBoatMovingUp;
+               %|
+  %             boatLifting ? isBoatLifting;
 
 %General components and their states
 GateID = struct G0 | G1;
+PositionID = struct P00 | P01 | P10 | P11 | P_none;
 
 
 %Gate to master and master to gate
@@ -13,11 +17,13 @@ G2M = struct	gateReady ? isGateReady |
 
 
 act
+shipPresence0:Bool;
+shipPresence1:Bool;
+moveShip00;
 
 %Gate subcontroller actions
 openGate, closeGate: GateID;
-gateState: GateID -> Bool;
-gateSensor: GateID -> Bool;
+
 
 
 
@@ -30,7 +36,9 @@ proc
 
 
 MasterController(s:state) =
-(isIdle(s)->m_sendToGate(setGateOpen0).MasterController(idle));
+(isIdle(s)->(sum b:Bool.shipPresence0(b).(b==true)-> (MasterController(boatMovingUP))<>MasterController(idle))+
+isBoatMovingUp(s)->m_sendToGate(setGateOpen0).
+%isBoatMovingDown);
 
 
 %Gate_Controller_proc
