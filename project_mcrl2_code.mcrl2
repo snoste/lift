@@ -21,7 +21,7 @@ PositionID = struct P00 | P01 | P10 | P11 | P_none;
 % Sub controllers
 
 %Gate to master and master to gate
-M2G = struct	setGateOpen(GateID) ? isSetGateOpen;
+M2G = struct	setGateOpen(GateID_none) ? isSetGateOpen;
 G2M = struct	gateReady ? isGateReady |
 		          gateError ? isGateError;
 
@@ -49,17 +49,17 @@ V2M = struct 	valveReady ? isValveReady |
 act
 %Master Controller actions
 shipPresence: PositionID -> Bool;
-%setGateOpen: GateID_none;
+setGateOpen: GateID_none;
 %isSetGateOpen: Bool;
-%setSignalPass: SLID;
-%setWaterLevel: LevelID;
+setSignalPass: SLID;
+setWaterLevel: LevelID;
 
 %gateReady, gateError, signalReady, signalError, valveReady, valveError;
 %isGateReady, isGateError, isSignalReady, isSignalError, isValveReady, isValveError: Bool;
 
 %Gate subcontroller actions
 openGate, closeGate: GateID;
-gateState, gateSensor: GateID -> Bool;
+gateSensor0, gateSensor1, gateState0, gateState1:Bool;
 
 %Signal subcontroller actions
 haltSignal, passSignal: SLID;
@@ -104,26 +104,23 @@ MasterController(s:state) =
 % If command recieved from the master to the gate (isSetGateOpen returns true or false) then loop through
 GateController = sum receive:M2G.g_recFromMaster(receive).(
 	%if a isSetGateOpen happens (is true), it means that setGateOpen(GateID_none) was sent. We loop through them and checks which parameter was inputed (G0n, G1n or G_none)
-	(isSetGateOpen(receive)) -> (sum Gvar_none:GateID_none.setGateOpen(Gvar_none).(
+	(isSetGateOpen(receive)==true) -> (sum Gvar_none:GateID_none.setGateOpen(Gvar_none).(
 	%Close any door that is open!
 	(Gvar_none == G_none) -> (
 		%Check if either gate is open and close them if they are, and send a gateReady to Master after closing. And if both are closed then send a gateReady back to Master
-		((gateState(G0)==true) -> (Gate0_close.g_sendToMaster(gateReady).GateController) <> sendToMaster(gateReady).GateController)+
-		((gateState(G1)==true) -> (Gate1_close.g_sendToMaster(gateReady).GateController) <> sendToMaster(gateReady).GateController))+
+		( sum b0:Bool.gateState0(b0).((b0==true) -> (Gate0_close.g_sendToMaster(gateReady).sendToMaster(gateReady).GateController) <>
+                                                (Gate1_close.g_sendToMaster(gateReady).sendToMaster(gateReady).GateController)))) +
 	%If the master wants to open the GO gate it sends a G0n and it checks if it is already closed and sends the Gate0_open if it is closed then ready signalReady otherwise send an error.
-	(Gvar_none == G0n) -> ((gateState(G1)==false) -> (Gate0_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))<> g_sendToMaster(gateReady)+
+	(Gvar_none == G0n) -> (sum b1:Bool.gateState1(b1).((b1==false) -> (openGate(G0).g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))
+        )<> g_sendToMaster(gateReady) +
 	%If the master wants to open the G1 gate it sends a G1n and it checks if it is already closed and sends the Gate1_open if it is closed then ready signalReady otherwise send an error.
-	(Gvar_none == G1n) -> ((gateState(G0)==false) -> (Gate1_open.g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))<> g_sendToMaster(gateReady)))
-
+	(Gvar_none == G1n) ->  (sum b0:Bool.gateState0(b0).((b0==false) -> (openGate(G1).g_sendToMaster(gateReady).GateController) <> (g_sendToMaster(error).GateController))
+        )<> g_sendToMaster(gateReady)))
   <> GateController);
 
 %Loop until a ship is not inbetween the gate and then close it (Remeber that this ship was instructed to start entering the sluic and should therefore be on its way already)
-Gate0_close = (gateSensor(G0)==false) -> closeGate(G0) <> Gate0_close;
-Gate1_close = (gateSensor(G1)==false) -> closeGate(G1) <> Gate1_close;
-
-%Do we really need to check if the waterlevel has changed as the master checks it and only opens a gate if it is safe. Those parameters are done by the valve subprocessor and after which the master will get here and
-Gate0_open = closeGate(G0);
-Gate1_open = closeGate(G1);
+Gate0_close = sum b0:Bool.gateSensor0(b0).((b0==false) ->  closeGate(G0) <> Gate0_close);
+Gate1_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
 
 %Signal subcontroller process
 %Check if recieved a signal from the master. If so, check which Signal to setPass, turn all other off and then the selected signal pass.
@@ -156,9 +153,7 @@ init
 % How this works: hide({someCommands}, allow({all actions!!!},comm({parallelCommunication},)))
 hide ({communicationM_G, communicationG_M, communicationM_V, communicationV_M, communicationM_S, communicationS_M},
 
-allow({shipPresence,setGateOpen,isSetGateOpen,setSignalPass, setWaterLevel, gateReady, gateError, signalReady, signalError,
-valveReady, valveError, isGateReady, isGateError, isSignalReady, isSignalError, isValveReady, isValveError,
-openGate, closeGate, gateState, gateSensor, haltSignal, passSignal,signalState, openValve, closeValve,communicationG_M,
+allow({shipPresence, openGate, closeGate, gateState0, gateState1, gateSensor0, gateSensor1, haltSignal, passSignal,signalState, openValve, closeValve,communicationG_M,
 communicationM_G,communicationM_S,communicationS_M,communicationM_V,communicationV_M},
 %set parallel actions
 comm(

@@ -7,7 +7,7 @@ GateID = struct G0 | G1;
 
 
 %Gate to master and master to gate
-M2G = struct	setGateOpen0 ? isSetGateOpen0 | setGateOpen1 ? isSetGateOpen1;
+M2G = struct	setGateOpen(GateID) ? isSetGateOpen;
 G2M = struct	gateReady ? isGateReady |
 		          gateError ? isGateError;
 
@@ -17,7 +17,7 @@ act
 %Gate subcontroller actions
 openGate, closeGate: GateID;
 gateState: GateID -> Bool;
-gateSensor0, gateSensor1 : Bool;
+gateSensor: GateID -> Bool;
 
 
 
@@ -35,9 +35,9 @@ MasterController(s:state) =
 
 %Gate_Controller_proc
 GateController = sum receive:M2G.g_recFromMaster(receive).
-	(isSetGateOpen0(receive)->Gate1_close.g_sendToMaster(gateReady).GateController<>GateController);
+	(isSetGateOpen0(receive)-> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController);
 
-Gate1_close = closeGate(G1);
+Gate1_close = sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
 
 
 init
