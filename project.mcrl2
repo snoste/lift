@@ -7,13 +7,18 @@ state =  struct idle ? isIdle|
 %General components and their states
 GateID = struct G0 | G1;
 PositionID = struct P00 | P01 | P10 | P11 | P_none;
-
+SLID = struct S00 | S01 | S10 | S11 | S_none;
 
 %Gate to master and master to gate
 M2G = struct	setGateOpen0 ? isSetGateOpen0 | setGateOpen1 ? isSetGateOpen1;
-G2M = struct	gateReady ? isGateReady |
-		          gateError ? isGateError;
+G2M = struct	gateReady0 ? isGateReady0 |
+		          gateError0 ? isGateError0 |
+							gateReady1 ? isGateReady1 |
+							gateError1 ? isGateError1;
 
+M2S = struct	setSignalPass00 ? isSignalSetPass00 | setSignalPass01 ? isSignalSetPass01 | setSignalPass11 ? isSignalSetPass11 | setSignalPass10 ? isSignalSetPass10;
+S2M = struct	signalReady ? isSignalReady |
+		          signalError ? isSignalError;
 
 act
 shipPresence0:Bool;
@@ -22,37 +27,56 @@ shipPresence1:Bool;
 %Gate subcontroller actions
 openGate, closeGate: GateID;
 gateSensor0, gateSensor1, gateState0, gateState1:Bool;
+haltSignal, passSignal: SLID;
 
 %goToPos00, goToPos01, goToPos11, gotToPos10;
-goToPos00, goToPos10;
+goToPos00,goToPos01, goToPos10;
 
 g_recFromMaster, m_sendToGate, communicationM_G : M2G;
 m_recFromGate, g_sendToMaster, communicationG_M : G2M;
 
+s_recFromMaster, m_sendToSignal, communicationM_S : M2S;
+m_recFromSignal, s_sendToMaster, communicationS_M : S2M;
 
 %--------------------------------------
 proc
 
 
 MasterController(s:state) =
-(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown));%+
-%(isBoatMovingUp(s) -> MasterController(idle))+
+(isIdle(s)-> goToPos00.m_sendToGate(setGateOpen0).MasterController(boatMovingUp) + goToPos10.m_sendToGate(setGateOpen1).MasterController(boatMovingDown)) +
+(isBoatMovingUp(s) -> m_sendToSignal(setSignalPass00).goToPos01);
 %(isBoatMovingDown(s) -> MasterController(idle));
-
 
 %Gate_Controller_proc
 GateController = sum receive:M2G.g_recFromMaster(receive).(
-	((isSetGateOpen0(receive) == true) -> Gate1_close.g_sendToMaster(gateReady).GateController<>GateController)+
-	((isSetGateOpen1(receive) == true) -> Gate0_close.g_sendToMaster(gateReady).GateController<>GateController));
+	((isSetGateOpen0(receive) == true) -> Gate1_close.g_sendToMaster(gateReady0).GateController<>GateController)+
+	((isSetGateOpen1(receive) == true) -> Gate0_close.g_sendToMaster(gateReady1).GateController<>GateController));
 
 Gate1_close = sum b1:Bool.gateSensor0(b1).((b1==false) ->  closeGate(G1) <> Gate1_close);
 Gate0_close = sum b1:Bool.gateSensor1(b1).((b1==false) ->  closeGate(G0) <> Gate0_close);
 
+
+SignalController = sum receive:M2S.s_recFromMaster(receive).(
+sum receive:M2S.s_recFromMaster(receive).(
+	(isSignalSetPass00(receive) == true) -> switchoffAll.passSignal(S00)+
+	(isSignalSetPass01(receive) == true) -> switchoffAll.passSignal(S01)+
+	(isSignalSetPass11(receive) == true) -> switchoffAll.passSignal(S11)+
+	(isSignalSetPass10(receive) == true) -> switchoffAll.passSignal(S10)+
+	SignalController
+).SignalController);
+
+switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
+
+
 init
-hide ({communicationM_G, communicationG_M},
+hide ({communicationM_G, communicationG_M,communicationM_S, communicationS_M},
 
-allow({openGate, closeGate, gateSensor0, gateSensor1, gateState0, gateState1, goToPos00, goToPos10, communicationG_M, communicationM_G},
+allow({openGate, closeGate, gateSensor0, gateSensor1, gateState0, gateState1, goToPos00, goToPos01, goToPos10, communicationG_M, communicationM_G, communicationM_S, communicationS_M},
 %set parallel actions
-comm({m_recFromGate | g_sendToMaster -> communicationG_M, g_recFromMaster | m_sendToGate -> communicationM_G},
+comm({m_recFromGate | g_sendToMaster -> communicationG_M,
+		g_recFromMaster | m_sendToGate -> communicationM_G,
+		s_recFromMaster | m_sendToSignal -> communicationM_S,
+		m_recFromSignal | s_sendToMaster -> communicationS_M
+		},
 
-MasterController(idle) || GateController)));
+MasterController(idle) || GateController || SignalController)));
