@@ -130,7 +130,7 @@ Gate1_open = closeGate(G1);
 
 %Signal subcontroller process
 %Check if recieved a signal from the master. If so, check which Signal to setPass, turn all other off and then the selected signal pass.
-SignalController = sum receive:M2S.s_receiveFromMaster(receive).(
+SignalController = sum receive:M2S.s_recFromMaster(receive).(
 	isSetSignalPass(receive) -> (sum Svar:SLID.setSignalPass(Svar).
 		(
 		((Svar==S00)->switchoffAll.passSignal(S00)
@@ -146,14 +146,21 @@ switchoffAll = haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11);
 
 
 %Valve subcontroller process
-ValveController = sum receive:M2V.v_receiveFromMaster(receive).(
+ValveController = sum recd:M2V.v_recFromMaster(recd).(
 				%check if message from master is received %close valve v1 in case we want to open v1  %check water level end send if everithink ok a valve ready message, otherwise error message
-isSetWaterLevel(receive) ->
-  ((receive==setWaterLevel(L0)) -> (closeValve(V1).openValve(V0).(compareWaterLevel(G0)) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
-							 ))+
-  ((receive==setWaterLevel(L1)) -> (closeValve(V0).openValve(V1).(compareWaterLevel(G1)) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController
+isSetWaterLevel(recd) -> (sum prump:LevelID.setWaterLevel(prump).(
+  ((prump==L0) -> closeValve(V1).openValve(V0).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))+
+  ((prump==L1) -> closeValve(V0).openValve(V1).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))))
+  <>ValveController);
+%compareWaterLevel(G1)==true
+
+
+
+%  ((receive==setWaterLevel(L0)) -> (closeValve(V1).openValve(V0).(compareWaterLevel(G0) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
+%							 ))+
+%  ((receive==setWaterLevel(L1)) -> (closeValve(V0).openValve(V1).(compareWaterLevel(G1) -> v_sendToMaster(valveReady).ValveController <> v_sendToMaster(valveError).ValveController)
 					%if no message, re-execute the cycle
-					) <> ValveController));
+					%))) <> ValveController);
 
 
 %0) wait
