@@ -3,27 +3,27 @@
 \subsubsection{Only one gate can be open at a time}
 \textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after gateState(gateID$_j$, $ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$:}
 	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openGate(gateID$_i$)]false
+		\item ~[$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openGate(gateID$_i$)]false
 		\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openGate(gateID$_i$)]false
 	\end{itemize}	
 	
 \subsubsection{Only one valve can be open at a time}
 \textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after valveState(valveID$_j$, $ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$:}
 	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openValve(valveID$_i$)]false
+		\item ~[$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openValve(valveID$_i$)]false
 		\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openValve(valveID$_i$)]false
 	\end{itemize}
 	
 \subsubsection{A valve and a gate at different levels can never be open at the same time}
 \textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after valveState(valveID$_j$, $ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for gate $i$ and valve $j$ are on opposite sides of the lift:}
 	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openGate(gateID$_i$)]false
+		\item ~[$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openGate(gateID$_i$)]false
 		\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openGate(gateID$_i$)]false
 	\end{itemize}
 
 \textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after gateState(gateID$_j$, $ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for valve $i$ and gate $j$ are on opposite sides of the lift:}
 	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
+		\item ~[$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
 		\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
 	\end{itemize}
 	
@@ -60,7 +60,7 @@
 \subsubsection{Signal lights can only indicate pass if the gate is completely opened}
 \textit{It is only possible to send passSignal(signalID$_i$, true) to set signal $i$ to pass after a gateState(gateID$_j$, $ b $) delivers $b = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift:}
 	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{gateState(gateID$_j$, true)}}$*.passSignal(signalID$_i$, true)]false
+		\item ~[$\overline{\textrm{gateState(gateID$_j$, true)}}$*.passSignal(signalID$_i$, true)]false
 		\item ~[true*.closeGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
 	\end{itemize}
 	
