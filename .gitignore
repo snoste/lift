@@ -13,6 +13,7 @@
 *.pdf
 *.lts
 *.lps
+*.pbes
 
 ## Intermediate documents:
 *.dvi

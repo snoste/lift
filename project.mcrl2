@@ -120,7 +120,7 @@ hide(
 		waterFlowState0,  waterFlowState1,
 		goToPos00, 		  goToPos01, 		goToPos10, 		  goToPos11,
 		gateSensor0,	  gateSensor1, 		gateState0, 	  gateState1,
-		communicationG_M, communicationM_G, communicationM_S, communicationS_M},
+		communicationG_M, communicationM_G, communicationM_S, communicationS_M,communicationM_V,  communicationV_M},
 %set parallel actions
 		comm(
 			{m_recFromGate 	| g_sendToMaster 	-> communicationG_M,
