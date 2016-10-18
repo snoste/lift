@@ -1,0 +1,97 @@
+\section{System Verification}
+\subsection{Safety}
+\subsubsection{Only one gate can be open at a time}
+\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$:}\\
+	\begin{equation*}
+	\textrm{
+		[true*.
+		$\overline{\textrm{gateState(gateID$_j$, false)}}$*.
+		openGate(gateID$_i$)]
+		false }
+	\end{equation*}
+	\begin{equation*}
+		\textrm{
+			[true*.
+			openGate(gateID$_j$).
+			$\overline{\textrm{gateState(gateID$_j$, false)}}$*.
+			openGate(gateID$_i$)]
+			false }
+	\end{equation*}	
+	
+	
+\subsubsection{Only one valve can be open at a time}
+\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{valveState(valveID}_j\textrm{, false}).\overline{\textrm{openValve(valveID}_j)}^*]<\textrm{openValve(valveID}_i)>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{valveState(valveID}_j\textrm{, false}).\overline{\textrm{openValve(valveID}_j)}^*]<\textrm{openValve(valveID}_i)>\textrm{false}
+	\end{equation*}
+	
+\subsubsection{A valve and a gate at different levels can never be open at the same time}
+\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after valveState(valveID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openValve(valveID$_j$) has not been issued in the meantime, for gate $i$ and valve $j$ are on opposite sides of the lift:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{valveState(valveID}_j\textrm{, false}).\overline{\textrm{openValve(valveID}_j)}^*]<\textrm{openGate(gateID}_i)>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{valveState(valveID}_j\textrm{, false}).\overline{\textrm{openValve(valveID}_j)}^*]<\textrm{openGate(gateID}_i)>\textrm{false}
+	\end{equation*}
+\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = false$ and openGate(gateID$_j$) has not been issued in the meantime, for valve $i$ and gate $j$ are on opposite sides of the lift:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{gateState(gateID}_j\textrm{, false}).\overline{\textrm{openGate(gateID}_j)}^*]<\textrm{openValve(valveID}_i)>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{gateState(gateID}_j\textrm{, false}).\overline{\textrm{openGate(gateID}_j)}^*]<\textrm{openValve(valveID}_i)>\textrm{false}
+	\end{equation*}
+	
+\subsubsection{A gate can only close if there is no ship in between its doors}
+\textit{It is only possible to send closeGate(gateID$_i$) to close gate $i$ after gateSensor(gateID$_i$, $\mathbb{B}$) delivers $\mathbb{B} = false$ and no other action has been issued in the meantime:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{gateSensor(gateID}_i \textrm{, false})]<\textrm{closeGate(gateID}_i)>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{gateSensor(gateID}_i \textrm{, false})]<\textrm{closeGate(gateID}_i)>\textrm{false}
+	\end{equation*}
+	
+\subsubsection{A gate can only open if the water level on both sides is equal}
+\textit{It is only possible to send openGate(gateID$_i$) to open gate $i$ after compareWaterlevel(containerID$_j$, $\mathbb{B}$) delivers $\mathbb{B} = true$ and no other action has been issued in the meantime, for gate $i$ and container $j$ are on the same side of the lift:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{compareWaterlevel(containerID}_j \textrm{, 	true})]<\textrm{openGate(gateID}_i)>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{compareWaterlevel(containerID}_j \textrm{, true})]<\textrm{openGate(gateID}_i)>\textrm{false}
+	\end{equation*}
+
+\subsubsection{Signal lights can never be off nor indicate hold and pass at the same time}
+\textit{passSignal(signalID$_i$, true) has to be followed directly by haltSignal(signalID$_i$, false):}\\
+	\begin{equation*}
+		\textrm{true}^*<\textrm{passSignal(signalID}_i \textrm{, true})>[\textrm{haltSignal(signalID}_i \textrm{, 	false})]\textrm{true}
+	\end{equation*}
+\textit{haltSignal(signalID$_i$, true) has to be followed directly by passSignal(signalID$_i$, false):}\\
+	\begin{equation*}
+		\textrm{true}^*<\textrm{haltSignal(signalID}_i \textrm{, true})>[\textrm{passSignal(signalID}_i \textrm{, false})]\textrm{true}
+	\end{equation*}
+\textit{passSignal(signalID$_i$, false) can only be issued directly after haltSignal(signalID$_i$, true):}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{haltSignal(signalID}_i \textrm{, true})]<\textrm{passSignal(signalID}_i \textrm{, false})>\textrm{true}
+	\end{equation*}
+\textit{haltSignal(signalID$_i$, false) can only be issued directly after passSignal(signalID$_i$, true):}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{passSignal(signalID}_i \textrm{, true})]<\textrm{haltSignal(signalID}_i \textrm{, false})>\textrm{true}
+	\end{equation*}
+\subsubsection{Signal lights can only indicate pass if the gate is completely opened}
+\textit{It is only possible to send passSignal(signalID$_i$, true) to set signal $i$ to pass after a gateState(gateID$_j$, $ \mathbb{B} $) delivers $\mathbb{B} = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{gateState(gateID}_j\textrm{, true}).\overline{\textrm{closeGate(gateID}_j)}^*]<\textrm{passSignal(signalID}_i \textrm{, true})>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{gateState(gateID}_j\textrm{, true}).\overline{\textrm{closeGate(gateID}_j)}^*]<\textrm{passSignal(signalID}_i \textrm{, true})>\textrm{false}
+	\end{equation*}
+\subsubsection{An entering signal can only indicate pass if there is no ship in the lift already}
+\textit{It is only possible to send passSignal(signalID$_i$, true) to set the entering signal $i$ to pass after shipPresence(posID$_{X.1}$, $\mathbb{B}$) delivers $\mathbb{B} = false$ and no other action has been issued in the meantime, for posID$_{X.1}$ is the ID of container X.1:}\\
+	\begin{equation*}
+		[\textrm{true}^*.\textrm{shipPresence(containerID}_{X.1} \textrm{, 	false})]<\textrm{passSignal(signalID}_i \textrm{, true})>\textrm{true}
+	\end{equation*}
+	\begin{equation*}
+		\neg[\textrm{true}^*.\textrm{shipPresence(containerID}_{X.1} \textrm{, 	false})]<\textrm{passSignal(signalID}_i \textrm{, true})>\textrm{false}
+	\end{equation*}
