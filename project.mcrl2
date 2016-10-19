@@ -50,7 +50,7 @@ act
 %Gate subcontroller actions
 openGate, 	 closeGate: GateID;
 openValve, 	 closeValve: ValveID;
-gateSensor0, gateSensor1, gateState0, gateState1, valveState0, valveState1:Bool;
+gateSensor0, gateSensor1, gateState0, gateState1, valveState0, valveState1, compareWaterLevel1, compareWaterLevel0:Bool;
 haltSignal,  passSignal: SLID;
 sensePosition: PositionID;
 
@@ -146,18 +146,17 @@ SignalController = sum receive:M2S.s_recFromMaster(receive).(
 %ValveController
 ValveController = sum receive:M2V.v_recFromMaster(receive).(
 				%check if message from master is received %close valve v1 in case we want to open v1  %check water level end send if everithink ok a valve ready message, otherwise error message
-					((isSetWaterLevel0(receive)==true) -> closeValve(V0).(sum b:Bool.valveState0(b).((b==false) -> openValve(V1)).v_sendToMaster(valveReady0) )) +
-					((isSetWaterLevel1(receive)==true) -> closeValve(V1).(sum b:Bool.valveState1(b).((b==false) -> openValve(V0)).v_sendToMaster(valveReady1) ))
-				).ValveController;
+					((isSetWaterLevel1(receive)==true) -> closeValve(V1).(sum b:Bool.valveState0(b).((b==false) -> openValve(V0).compare1.ValveController <> compare1.ValveController) )) +
+					((isSetWaterLevel0(receive)==true) -> closeValve(V0).(sum b:Bool.valveState1(b).((b==false) -> openValve(V1).compare0.ValveController <> compare0.ValveController) )));
 
+compare1 =	(sum b:Bool.compareWaterLevel1(b).((b==true) ->  v_sendToMaster(valveReady1).GateController <> compare1));
+compare0 =	(sum b:Bool.compareWaterLevel0(b).((b==true) ->  v_sendToMaster(valveReady0).GateController <> compare0));
 
 %  ((prump==L0) -> closeValve(V1).openValve(V0).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))+
 %  ((prump==L1) -> closeValve(V0).openValve(V1).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))))
 %  <>ValveController);
 
 init
-
-
 	allow(
 		{openValve, 	 closeValve,
 		openGate, 		  closeGate,
@@ -169,6 +168,7 @@ init
 		gateState0,  gateState1,
 	  haltSignal,  passSignal,
 		sensePosition,
+		compareWaterLevel1,compareWaterLevel0,
 		communicationG_M, communicationM_G, communicationM_S, communicationS_M,communicationM_V,  communicationV_M},
 %set parallel actions
 		comm(
