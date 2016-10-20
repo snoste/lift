@@ -16,6 +16,7 @@ state =  struct idle 			? isIdle			|
 				boatMovingDown_finished? isBoatMovingDown_finished|
 				boatMovingDown_exit ? isBoatMovingDown_exit|
 				stateMoveToP11 ? isStateMoveToP11|
+				boatEndDown ? isBoatEndDown|
 
 				signalDoneDown ? isSignalDoneDown|
 				signalDoneUp ? isSignalDoneUp|
@@ -122,14 +123,14 @@ MasterController(s:state) =
 (isBoatMovingDown_exitOpen(s)  ->  (sum receive:G2M.m_recFromGate(receive).(isGateReady0(receive) == true) ->
 			m_sendToSignal(setSignalPass01).MasterController(boatMovingDown_finished) <> MasterController(boatMovingDown_exitOpen)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-(isWaitForS01_Down(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS01(receive) == true) ->
-			boatExitDown.MasterController(boatMovingDown_exit) <> MasterController(waitForS10_Down)))+
+(isBoatMovingDown_finished(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS01(receive) == true) ->
+			boatExitDown.MasterController(boatMovingDown_exit) <> MasterController(boatMovingDown_finished)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltFinish).MasterController(boatMovingDown_finished))+
+(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltFinish).MasterController(boatEndDown))+
 
 %Check if door0 closed and set the master to the idle state
-(isBoatMovingDown_finished(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltFinish).MasterController(signalDoneDown) <> MasterController(boatMovingDown_finished)))+
+(isBoatEndDown(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
+			m_sendToSignal(setSignalHaltFinish).MasterController(signalDoneDown) <> MasterController(boatEndDown)))+
 
 (isSignalDoneDown(s)  -> (sum receive:S2M.m_recFromSignal(receive).(isHaltReady(receive) == true) ->
 			MasterController(idle) <> MasterController(signalDoneDown)))+
