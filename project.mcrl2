@@ -14,6 +14,7 @@ state =  struct idle 			? isIdle			|
 				boatMovingDown_elevate ? isBoatMovingDown_elevate|
 				boatMovingDown_exitOpen ? isBoatMovingDown_exitOpen|
 				boatMovingDown_finished? isBoatMovingDown_finished|
+
 				signalDone ? isSignalDone;
 
 
@@ -72,9 +73,9 @@ m_recFromValve, v_sendToMaster, communicationV_M : V2M;
 %--------------------------------------
 proc
 MasterController(s:state) =
-(isIdle(s)	 ->	  (sum receive:PositionID.sensePosition(receive).(isP00(receive) == true) ->
-						m_sendToValve(setWaterLevel0).MasterController(decreaseWaterLevel)<>(
-						(isP10(receive)==true)->m_sendToValve(setWaterLevel1).MasterController(increaseWaterLevel)<>MasterController(idle))))+
+(isIdle(s)	 ->	  (sum receive:PositionID.sensePosition(receive).
+						(isP00(receive) == true) ->m_sendToValve(setWaterLevel0).MasterController(decreaseWaterLevel)<>(
+						(isP10(receive)==true)	 ->m_sendToValve(setWaterLevel1).MasterController(increaseWaterLevel)<>MasterController(idle))))+
 %Check if the waterlevel is set to L1 and then open the gate1
 (isIncreaseWaterLevel(s) ->  (sum receive:V2M.m_recFromValve(receive).(isValveReady1(receive) == true) ->
 			m_sendToGate(setGateOpen1).MasterController(boatMovingDown_enterOpen) <> MasterController(increaseWaterLevel)))+
