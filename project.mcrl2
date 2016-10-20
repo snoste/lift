@@ -51,8 +51,7 @@ M2S = struct	setSignalPass00 ? isSignalSetPass00 |
 				setSignalPass01 ? isSignalSetPass01 |
 				setSignalPass11 ? isSignalSetPass11 |
 				setSignalPass10 ? isSignalSetPass10 |
-				setSignalHaltAll ? isSignalSetHaltAll|
-				setSignalHaltFinish ? isSignalSetHaltFinish;
+				setSignalHaltAll ? isSignalSetHaltAll;
 
 S2M = struct	haltReady 	? isHaltReady|
 							signalReadyS00 ? isSignalReadyS00|
@@ -126,13 +125,13 @@ MasterController(s:state) =
 (isBoatMovingDown_finished(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS01(receive) == true) ->
 			boatExitDown.MasterController(boatMovingDown_exit) <> MasterController(boatMovingDown_finished)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltFinish).MasterController(boatEndDown))+
+(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltAll).MasterController(idle))+
 
 %Check if door0 closed and set the master to the idle state
-(isBoatEndDown(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltFinish).MasterController(signalDoneDown) <> MasterController(boatEndDown)))+
+(isBoatEndDown(s)  -> (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
+			m_sendToGate(setGateOpenNone).MasterController(signalDoneDown) <> MasterController(boatEndDown)))+
 
-(isSignalDoneDown(s)  -> (sum receive:S2M.m_recFromSignal(receive).(isHaltReady(receive) == true) ->
+(isSignalDoneDown(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
 			MasterController(idle) <> MasterController(signalDoneDown)))+
 
 
@@ -159,37 +158,40 @@ MasterController(s:state) =
 %---------------------------------------------------------------------------------------------------------------------------------
 %Check if the door1 is closed and go back to state: idle.
 (isBoatMovingUp_finished(s) -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltFinish).MasterController(signalDoneUp) <> MasterController(boatMovingUp_finished)))+
+			m_sendToSignal(setSignalHaltAll).MasterController(signalDoneUp) <> MasterController(boatMovingUp_finished)))+
 %---------------------------------------------------------------------------------------------------------------------------------
 (isSignalDoneUp(s) -> (sum receive:S2M.m_recFromSignal(receive).(isHaltReady(receive)==true) ->
-		(sensePosition(P00)+sensePosition(P10)+sensePosition(Pnone)).MasterController(idle) <> MasterController(signalDoneUp)));
+		MasterController(idle) <> MasterController(signalDoneUp)));
 
 %(sensePosition(P00)+sensePosition(P10)+sensePosition(Pnone)).
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------
-
+%.openGate(G0).g_sendToMaster(gateReady0).GateController
 %Gate Contrller
 GateController = sum receive:M2G.g_recFromMaster(receive).(
-					((isSetGateOpen0(receive) == true) -> GateClose1.openGate(G0) <> GateController) +
-					((isSetGateOpen1(receive) == true) -> GateClose0.openGate(G0) <> GateController) +
-					((isSetGateOpenNone(receive) == true) -> GateCloseAll <> GateController));
+					((isSetGateOpen0(receive) == true) 		-> GateClose1 	 <>
+					((isSetGateOpen1(receive) == true) 		-> GateClose0 	 <>
+					((isSetGateOpenNone(receive) == true) -> GateSequence1 <> GateController))));
 
-GateClose1 	 =	(sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).g_sendToMaster(gateReady0).GateController <> GateClose1));
-GateClose0 	 =	(sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).g_sendToMaster(gateReady1).GateController <> GateClose0));
+GateClose1 	 =	(sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).GateClose1_1 <> GateClose1));
+GateClose1_1 =  (sum b:Bool.gateSensor1(b).((b==false) ->  openGate(G0).GateClose1_2 <> GateClose1_1));
+GateClose1_2 =  g_sendToMaster(gateReady0).GateController;
 
-GateSequence1 = (sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0) <> GateSequence1));
-GateSequence2 = (sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1) <> GateSequence2));
-GateCloseAll = GateSequence1.GateSequence2.g_sendToMaster(gateNoneReady).GateController;
+GateClose0 	 =	(sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).GateClose0_1 <> GateClose0));
+GateClose0_1 =  (sum b:Bool.gateSensor0(b).((b==false) ->  openGate(G0).GateClose0_2 <> GateClose0_1));
+GateClose0_2 =  g_sendToMaster(gateReady1).GateController;
+
+GateSequence1 = (sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).GateSequence2 <> GateSequence1));
+GateSequence2 = (sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).GateSequence3 <> GateSequence2));
+GateSequence3 = g_sendToMaster(gateNoneReady).GateController;
 
 %---------------------------------------------------------------------------------------------------------------------------------
 %Signal Controller
-SignalController = sum receive:M2S.s_recFromMaster(receive).(
-						sum receive:M2S.s_recFromMaster(receive).(
-							(isSignalSetPass00(receive) == true) ->(haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S00).s_sendToMaster(signalReadyS00).SignalController) <> SignalController+
-							(isSignalSetPass01(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S01).s_sendToMaster(signalReadyS01).SignalController) <> SignalController+
-							(isSignalSetPass11(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S11).s_sendToMaster(signalReadyS11).SignalController) <> SignalController+
-							(isSignalSetPass10(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S10).s_sendToMaster(signalReadyS10).SignalController) <> SignalController+
-							(isSignalSetHaltAll(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).s_sendToMaster(signalReadyHaltAll).SignalController) <> SignalController+
-							(isSignalSetHaltFinish(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).s_sendToMaster(haltReady).SignalController) <> SignalController));
+SignalController = (sum receive:M2S.s_recFromMaster(receive).(
+		(isSignalSetPass00(receive) == true) ->(haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S00).s_sendToMaster(signalReadyS00).SignalController) <> SignalController+
+		(isSignalSetPass01(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S01).s_sendToMaster(signalReadyS01).SignalController) <> SignalController+
+		(isSignalSetPass11(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S11).s_sendToMaster(signalReadyS11).SignalController) <> SignalController+
+		(isSignalSetPass10(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S10).s_sendToMaster(signalReadyS10).SignalController) <> SignalController+
+		(isSignalSetHaltAll(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).s_sendToMaster(signalReadyHaltAll).SignalController) <> SignalController));
 %---------------------------------------------------------------------------------------------------------------------------------
 %ValveController
 ValveController = sum receive:M2V.v_recFromMaster(receive).(
