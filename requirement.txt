@@ -1,0 +1,78 @@
+Requirement 1.mcf
+
+forall G:GateID.[true?.gateState(G,false).!(openGate(G))] <openGate(0)> true &&
+[true?.gateState(0,false).!(openGate(0))] <openGate(1)> true
+
+![true?.gateState(1,false).!(openGate(1))] <openGate(0)> false &&
+![true?.gateState(0,false).!(openGate(0))] <openGate(1)> false
+
+Requirement 2.mcf
+[true?.valveState(1,false).!(openValve(1))] <openValve(0)> true &&
+[true?.valveState(0,false).!(openValve(0))] <openValve(1)> true
+
+![true?.valveState(1,false).!(openValve(1))] <openValve(0)> false &&
+![true?.valveState(0,false).!(openValve(0))] <openValve(1)>
+
+Requirement 3.mcf
+[true?.valveState(1,false).!(openValve(1))] <openGate(0)> true &&
+[true?.valveState(0,false).!(openValve(0))] <openGate(1)> true &&
+[true?.gateState(1,false).!(openGate(1))] <openValve(0)> true &&
+[true?.gateState(0,false).!(openGate(0))] <openValve(1)> true
+
+![true?.valveState(1,false).!(openValve(1))] <openGate(0)> false &&
+![true?.valveState(0,false).!(openValve(0))] <openGate(1)> false &&
+![true?.gateState(1,false).!(openGate(1))] <openValve(0)> false &&
+![true?.gateState(0,false).!(openGate(0))] <openValve(1)> false
+
+Requirement 4.mcf
+[true?.gateSensor(0,false)] <closeGate(0)> true &&
+[true?.gateSensor(1,false)] <closeGate(1)> true
+
+![true?.gateSensor(0,false)] <closeGate(0)> false &&
+![true?.gateSensor(1,false)] <closeGate(1)> false
+
+Requirement 5.mcf
+[true?.compareWaterlevel(0.0,true)] <openGate(0)> true &&
+[true?.compareWaterlevel(1.0,true)] <openGate(1)> true
+
+![true?.compareWaterlevel(0.0,true)] <openGate(0)> false &&
+![true?.compareWaterlevel(1.0,true)] <openGate(1)> false
+
+Requirement 6.mcf
+true? <passSignal(0.0,true)> [haltSignal(0.0,false)] true &&
+true? <haltSignal(0.0,true)> [passSignal(0.0,false)] true &&
+[true?.haltSignal(0.0,true)] <passSignal(0.0,false)> true &&
+[true?.passSignal(0.0,true)] <haltSignal(0.0,false)> true
+
+true? <passSignal(0.1,true)> [haltSignal(0.1,false)] true &&
+true? <haltSignal(0.1,true)> [passSignal(0.1,false)] true &&
+[true?.haltSignal(0.1,true)] <passSignal(0.1,false)> true &&
+[true?.passSignal(0.1,true)] <haltSignal(0.1,false)> true
+
+true? <passSignal(1.0,true)> [haltSignal(1.0,false)] true &&
+true? <haltSignal(1.0,true)> [passSignal(1.0,false)] true &&
+[true?.haltSignal(1.0,true)] <passSignal(1.0,false)> true &&
+[true?.passSignal(1.0,true)] <haltSignal(1.0,false)> true
+
+true? <passSignal(1.1,true)> [haltSignal(1.1,false)] true &&
+true? <haltSignal(1.1,true)> [passSignal(1.1,false)] true &&
+[true?.haltSignal(1.1,true)] <passSignal(1.1,false)> true &&
+[true?.passSignal(1.1,true)] <haltSignal(1.1,false)> true
+
+Requirement 7.mcf
+[true?.gateState(0,true).closeGate(0)] <passSignal(0.0,true)> true &&
+[true?.gateState(0,true).closeGate(0)] <passSignal(0.1,true)> true &&
+[true?.gateState(1,true).closeGate(1)] <passSignal(1.1,true)> true &&
+[true?.gateState(1,true).closeGate(1)] <passSignal(1.0,true)> true
+
+![true?.gateState(0,true).closeGate(0)] <passSignal(0.0,true)> false &&
+![true?.gateState(0,true).closeGate(0)] <passSignal(0.1,true)> false &&
+![true?.gateState(1,true).closeGate(1)] <passSignal(1.1,true)> false &&
+![true?.gateState(1,true).closeGate(1)] <passSignal(1.0,true)> false
+
+Requirement 8.mcf
+[true?.shipPresence(containerID X.1,false)] <passSignal(0.0,true)> true ||
+[true?.shipPresence(containerID X.1,false)] <passSignal(1.0,true)> true
+
+![true?.shipPresence(containerID X.1,false)] <passSignal(0.0,true)> false ||
+![true?.shipPresence(containerID X.1,false)] <passSignal(1.0,true)> false
