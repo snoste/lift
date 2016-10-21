@@ -8,6 +8,9 @@ state =  struct idle 			? isIdle			|
 				boatMovingUp_elevate ? isBoatMovingUp_elevate|
 				boatMovingUp_exitOpen ? isBoatMovingUp_exitOpen|
 				boatMovingUp_finished? isBoatMovingUp_finished|
+				stateMoveToP01 ? isStateMoveToP01|
+				boatMovingUp_exit ? isBoatMovingUp_exit|
+				boatEndUp ? isBoatEndUp|
 
 				boatMovingDown_enterOpen 	? isBoatMovingDown_enterOpen |
 				boatMovingDown_enterClose 	? isBoatMovingDown_enterClose |
@@ -75,7 +78,7 @@ haltSignal,  passSignal: SLID;
 sensePosition: PositionID;
 
 %goToPos00, goToPos01, goToPos11, gotToPos10;
-goToPos00,goToPos01, goToPos10, goToPos11, boatExit, boatExitDown;
+goToPos00,goToPos01, goToPos10, goToPos11, boatExit,boatExitUp, boatExitDown;
 
 g_recFromMaster, m_sendToGate, communicationM_G : M2G;
 m_recFromGate, g_sendToMaster, communicationG_M : G2M;
@@ -108,7 +111,7 @@ MasterController(s:state) =
 %---------------------------------------------------------------------------------------------------------------------------------
 %Check if the door1 is closed and set the waterlevel to L0.
 (isBoatMovingDown_enterClose(s)  ->  (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltAll).MasterController() <> MasterController(boatMovingDown_enterClose)))+
+			m_sendToSignal(setSignalHaltAll).MasterController(waitForHaltAll_EnterDown) <> MasterController(boatMovingDown_enterClose)))+
 %---------------------------------------------------------------------------------------------------------------------------------
 %Check if the all signal went to halt and then
 (isWaitForHaltAll_EnterDown(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
@@ -125,47 +128,63 @@ MasterController(s:state) =
 (isBoatMovingDown_finished(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS01(receive) == true) ->
 			boatExitDown.MasterController(boatMovingDown_exit) <> MasterController(boatMovingDown_finished)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltAll).MasterController(idle))+
-
+(isBoatMovingDown_exit(s) -> m_sendToSignal(setSignalHaltAll).MasterController(boatEndDown))+
+%---------------------------------------------------------------------------------------------------------------------------------
 %Check if door0 closed and set the master to the idle state
 (isBoatEndDown(s)  -> (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
 			m_sendToGate(setGateOpenNone).MasterController(signalDoneDown) <> MasterController(boatEndDown)))+
-
+%---------------------------------------------------------------------------------------------------------------------------------
 (isSignalDoneDown(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
 			MasterController(idle) <> MasterController(signalDoneDown)))+
-
-
 %---------------------------------------------------------------------------------------------------------------------------------
-%Check if the waterlevel is set to L0 and then open the gate0
-(isDecreaseWaterLevel(s)  ->  (sum receive:V2M.m_recFromValve(receive).(isValveReady0(receive) == true) ->
-			m_sendToGate(setGateOpen0).MasterController(decreaseWaterLevel) <> MasterController(decreaseWaterLevel)))+
+%
+%NEXT OPTION START HERE
 %---------------------------------------------------------------------------------------------------------------------------------
-%Check if the gate0 was opened. Then the boat enters and the door0 closes
-(isBoatMovingUp_enterOpen(s) ->  (sum receive:G2M.m_recFromGate(receive).(isGateReady0(receive) == true) ->
-			m_sendToSignal(setSignalPass00).goToPos01.m_sendToGate(setGateOpenNone).MasterController(boatMovingUp_enterClose) <> MasterController(boatMovingUp_enterOpen)))+
+%
+%Check if the waterlevel is set to L1 and then open the gate1
+(isDecreaseWaterLevel(s) ->  (sum receive:V2M.m_recFromValve(receive).(isValveReady0(receive) == true) ->
+			m_sendToGate(setGateOpen0).MasterController(boatMovingUp_enterOpen) <> MasterController(decreaseWaterLevel)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-%Check if the door0 is closed and set the waterleve to L1.
-(isBoatMovingUp_enterClose(s) ->  (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltAll).m_sendToValve(setWaterLevel1).MasterController(boatMovingUp_elevate) <> MasterController(boatMovingUp_enterClose)))+
+%Check if the gate1 was opened. Then the boat enters and the doorq closes
+(isBoatMovingUp_enterOpen(s)  ->  (sum receive:G2M.m_recFromGate(receive).(isGateReady0(receive) == true) ->
+			m_sendToSignal(setSignalPass00).MasterController(waitForS00_Up) <> MasterController(boatMovingUp_enterOpen)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-%Check if the waterlevel is set to L1. Then open the door1.
+%Check if there is a response from S10 and then close the gate
+(isWaitForS00_Up (s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS00(receive) == true) ->
+			goToPos01.MasterController(stateMoveToP01) <> MasterController(waitForS00_Up)))+
+%---------------------------------------------------------------------------------------------------------------------------------
+(isStateMoveToP01(s) -> m_sendToGate(setGateOpenNone).MasterController(boatMovingUp_enterClose))+
+%---------------------------------------------------------------------------------------------------------------------------------
+%Check if the door1 is closed and set the waterlevel to L0.
+(isBoatMovingUp_enterClose(s)  ->  (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
+			m_sendToSignal(setSignalHaltAll).MasterController(waitForHaltAll_EnterUp) <> MasterController(boatMovingUp_enterClose)))+
+%---------------------------------------------------------------------------------------------------------------------------------
+%Check if the all signal went to halt and then
+(isWaitForHaltAll_EnterUp(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
+			m_sendToValve(setWaterLevel1).MasterController(boatMovingUp_elevate) <> MasterController(waitForHaltAll_EnterUp)))+
+%---------------------------------------------------------------------------------------------------------------------------------
+%Check if the waterlevel is set to L0. Then open the door0.
 (isBoatMovingUp_elevate(s)  ->  (sum receive:V2M.m_recFromValve(receive).(isValveReady1(receive) == true) ->
 			m_sendToGate(setGateOpen1).MasterController(boatMovingUp_exitOpen) <> MasterController(boatMovingUp_elevate)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-%check if Door1 is opened, boat goes out and door closes.
+%Check if gate0 is closed and boat exitst and gate closes. Then door0 closes.
 (isBoatMovingUp_exitOpen(s)  ->  (sum receive:G2M.m_recFromGate(receive).(isGateReady1(receive) == true) ->
-			m_sendToSignal(setSignalPass11).boatExit.m_sendToGate(setGateOpenNone).MasterController(boatMovingUp_finished) <> MasterController(boatMovingUp_exitOpen)))+
+			m_sendToSignal(setSignalPass11).MasterController(boatMovingUp_finished) <> MasterController(boatMovingUp_exitOpen)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-%Check if the door1 is closed and go back to state: idle.
-(isBoatMovingUp_finished(s) -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
-			m_sendToSignal(setSignalHaltAll).MasterController(signalDoneUp) <> MasterController(boatMovingUp_finished)))+
+(isBoatMovingUp_finished(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyS11(receive) == true) ->
+			boatExitUp.MasterController(boatMovingUp_exit) <> MasterController(boatMovingUp_finished)))+
 %---------------------------------------------------------------------------------------------------------------------------------
-(isSignalDoneUp(s) -> (sum receive:S2M.m_recFromSignal(receive).(isHaltReady(receive)==true) ->
-		MasterController(idle) <> MasterController(signalDoneUp)));
+(isBoatMovingUp_exit(s) -> m_sendToSignal(setSignalHaltAll).MasterController(boatEndUp))+
+%---------------------------------------------------------------------------------------------------------------------------------
+%Check if door0 closed and set the master to the idle state
+(isBoatEndUp(s)  -> (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
+			m_sendToGate(setGateOpenNone).MasterController(signalDoneUp) <> MasterController(boatEndUp)))+
+%---------------------------------------------------------------------------------------------------------------------------------
+(isSignalDoneUp(s)  -> (sum receive:G2M.m_recFromGate(receive).(isGateNoneReady(receive) == true) ->
+			MasterController(idle) <> MasterController(signalDoneUp)));
 
-%(sensePosition(P00)+sensePosition(P10)+sensePosition(Pnone)).
+
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------
-%.openGate(G0).g_sendToMaster(gateReady0).GateController
 %Gate Contrller
 GateController = sum receive:M2G.g_recFromMaster(receive).(
 					((isSetGateOpen0(receive) == true) 		-> GateClose1 	 <>
@@ -219,7 +238,7 @@ init
 		gateSensor0,	  gateSensor1,
 		gateState0,  gateState1,
 	  haltSignal,  passSignal,
-		sensePosition,
+		sensePosition,boatExitUp,
 		compareWaterLevel1,compareWaterLevel0,
 		communicationG_M, communicationM_G, communicationM_S, communicationS_M,communicationM_V,  communicationV_M},
 %set parallel actions
