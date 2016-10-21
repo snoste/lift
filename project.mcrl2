@@ -161,7 +161,7 @@ MasterController(s:state) =
 %---------------------------------------------------------------------------------------------------------------------------------
 %Check if the all signal went to halt and then
 (isWaitForHaltAll_EnterUp(s)  ->  (sum receive:S2M.m_recFromSignal(receive).(isSignalReadyHaltAll(receive) == true) ->
-			m_sendToValve(setWaterLevel1).MasterController(boatMovingUp_elevate) <> MasterController(waitForHaltAll_EnterUp)))+
+			boatExitUp.m_sendToValve(setWaterLevel1).MasterController(boatMovingUp_elevate) <> MasterController(waitForHaltAll_EnterUp)))+
 %---------------------------------------------------------------------------------------------------------------------------------
 %Check if the waterlevel is set to L0. Then open the door0.
 (isBoatMovingUp_elevate(s)  ->  (sum receive:V2M.m_recFromValve(receive).(isValveReady1(receive) == true) ->
@@ -218,8 +218,8 @@ ValveController = sum receive:M2V.v_recFromMaster(receive).(
 					((isSetWaterLevel1(receive)==true) -> closeValve(V0).(sum b:Bool.valveState1(b).((b==false) -> openValve(V1).compare1.ValveController <> compare1.ValveController) )) +
 					((isSetWaterLevel0(receive)==true) -> closeValve(V1).(sum b:Bool.valveState0(b).((b==false) -> openValve(V0).compare0.ValveController <> compare0.ValveController) )));
 
-compare1 =	(sum b:Bool.compareWaterLevel1(b).((b==true) ->  v_sendToMaster(valveReady1).GateController <> compare1));
-compare0 =	(sum b:Bool.compareWaterLevel0(b).((b==true) ->  v_sendToMaster(valveReady0).GateController <> compare0));
+compare1 =	(sum b:Bool.compareWaterLevel1(b).((b==true) ->  v_sendToMaster(valveReady1).ValveController <> compare1));
+compare0 =	(sum b:Bool.compareWaterLevel0(b).((b==true) ->  v_sendToMaster(valveReady0).ValveController <> compare0));
 
 %  ((prump==L0) -> closeValve(V1).openValve(V0).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))+
 %  ((prump==L1) -> closeValve(V0).openValve(V1).((true) -> (v_sendToMaster(valveReady).ValveController) <> (v_sendToMaster(valveError).ValveController)))))
