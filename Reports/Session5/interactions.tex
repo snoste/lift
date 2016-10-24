@@ -7,12 +7,20 @@
 		\toprule
 		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 		\midrule
-		openGate & Open gate with the corresponding gate ID & gateID \\
-		closeGate & Close gate with the corresponding gate ID & gateID \\
+		openGate & Open gate with the corresponding gate ID & GateID \\
+		closeGate & Close gate with the corresponding gate ID & GateID \\
 		openValve & Open valve with the corresponding gate ID & valveID \\
 		closeValve & Close valve with the corresponding gate ID & valveID \\
-		haltSignal & Turn the given halt signal light on or off & signalID, $\mathbb{B}$\\
-		passSignal & Turn the given pass signal light on or off & signalID, $\mathbb{B}$\\
+		goToPos00  & simulation of a ship that is going to position 00 & $ \mathbb{B} $ \\
+		goToPos01  & simulation of a ship that is going to position 01 & $ \mathbb{B} $ \\
+		goToPos10  & simulation of a ship that is going to position 10 & $ \mathbb{B} $ \\
+		goToPos11  & simulation of a ship that is going to position 11 & $ \mathbb{B} $ \\
+		boatExitUp  & simulation of a ship that is exiting the system from the upper gate & $ \mathbb{B} $ \\
+		boatExitDown  & simulation of a ship that is exiting the system from the lower gate & $ \mathbb{B} $ \\
+		passSignalOn & Turn the given pass signal light on & SLID\\
+		passSignalOff & Turn the given pass signal light off & SLID\\
+		haltSignalOn & Turn the given halt signal light on & SLID\\
+		haltSignalOff & Turn the given halt signal light off & SLID\\
 
 \bottomrule
 \end{tabular}%
@@ -32,16 +40,46 @@
 				\toprule
 				\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 				\hline
-				gateState & Returns open (true) or closed (false) & gateID, $ \mathbb{B} $ \\
-				valveState & Returns open (true) or closed (false) & valveID, $ \mathbb{B} $ \\
-				waterflowState & Returns on (true) or off (false) & valveID, $ \mathbb{B} $ \\
-				compareWaterlevel & Compare ContainerID to Container X.1. Equal (true) or unequal (false) & containerID, $ \mathbb{B} $ \\
-				signalState & Returns pass (true) or hold (false) & signalID, $ \mathbb{B} $ \\
-				gateSensor &  Returns true if something is inbetween the gates, otherwise false & gateID, $ \mathbb{B} $ \\
-				shipPresence  & Returns true, if a ship is present at the given position, otherwise false & posID, $ \mathbb{B} $ \\
+				gateState0 & Returns open (true) or closed (false) in relation to the Gate 0 state &  $ \mathbb{B} $ \\
+				gateState1 & Returns open (true) or closed (false) in relation to the Gate 0 state &  $ \mathbb{B} $ \\
+				valveState0 & Returns open (true) or closed (false) in relation to the Valve 0 state &  $ \mathbb{B} $ \\
+				valveState1 & Returns open (true) or closed (false) in relation to the Valve 1 state &  $ \mathbb{B} $ \\
+				compareWaterlevel0 & Compare the water level of the lower containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
+				compareWaterlevel1 & Compare the water level of the upper containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
+				gateSensor0 &  Returns true if something is inbetween the gate 0, otherwise false &  $ \mathbb{B} $ \\
+				gateSensor1 &  Returns true if something is inbetween the gate 1, otherwise false &  $ \mathbb{B} $ \\
+				sensePosition  & Returns the position ID of the presence of ships otherwise Pnone meaning no ships & posID \\
 				\bottomrule
 			\end{tabular}%
 				\label{tab:addlabel}%
 				\end{table}%
+	
+			
+			
+			\begin{table}[htbp]
+				\centering
+				\caption{)}
+				\begin{tabular}{lp{6cm}l}
+					\toprule
+					\textbf{Parameter} & \textbf{Specification} & \textbf{Description} \\
+					\hline
+					SLID & S00 &  Signal 00 identifier\\
+					SLID & S01 &  Signal 01 identifier\\
+					SLID  & S10 &  Signal 10 identifier\\
+					SLID  & S00 &  Signal 11 identifier\\
+					SLID    & S\_none &  identify no signal\\
+					ValveID & V0 &  Valve 0 identifier\\
+					ValveID & V1 &  Valve 1 identifier\\
+					GateID & G0 &  Gate 0 identifier\\
+					GateID & G1 &  Gate 1 identifier\\
+					PositionID & P00 &  Position 00 identifier\\
+					PositionID & P10 &  Position 10 identifier\\
+					PositionID   & Pnone &  identify no position\\
+					
+				\end{tabular}%
+				\label{tab:addlabel}%
+			\end{table}%
+			
 				
+
 				
