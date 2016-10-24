@@ -201,20 +201,27 @@ MasterController(s:state) =
 %-----------------------------------------------------------------------------------------------------------------------------------------------------------
 %Gate Contrller
 GateController = sum receive:M2G.g_recFromMaster(receive).(
-					((isSetGateOpen0(receive) == true) 		-> GateClose1 	 <>
-					((isSetGateOpen1(receive) == true) 		-> GateClose0 	 <>
-					((isSetGateOpenNone(receive) == true) -> GateSequence1 <> GateController))));
+					((isSetGateOpen0(receive) == true) 		-> CheckGateClose1	 <>
+					((isSetGateOpen1(receive) == true) 		-> CheckGateClose0 	 <>
+					((isSetGateOpenNone(receive) == true) -> GateSequence0 <> GateController))));
 
-GateClose1 	 =	(sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).GateClose1_1 <> GateClose1));
-GateClose1_1 =  (sum b:Bool.gateSensor1(b).((b==false) ->  openGate(G0).GateClose1_2 <> GateClose1_1));
+CheckGateClose1 = (sum b:Bool.gateState1(b).((b==false) -> GateClose1_1 <> GateClose1));
+GateClose1 	 =	(sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).CheckGateClose1 <> GateClose1));
+GateClose1_1 =  openGate(G0).GateClose1_2;
 GateClose1_2 =  g_sendToMaster(gateReady0).GateController;
 
-GateClose0 	 =	(sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).GateClose0_1 <> GateClose0));
-GateClose0_1 =  (sum b:Bool.gateSensor0(b).((b==false) ->  openGate(G0).GateClose0_2 <> GateClose0_1));
+CheckGateClose0 = (sum b:Bool.gateState0(b).((b==false) -> GateClose0_1 <> GateClose0));
+GateClose0 	 =	(sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).CheckGateClose0 <> GateClose0));
+GateClose0_1 =  openGate(G1).GateClose0_2;
 GateClose0_2 =  g_sendToMaster(gateReady1).GateController;
 
-GateSequence1 = (sum b:Bool.gateSensor0(b).((b==false) ->  closeGate(G0).GateSequence2 <> GateSequence1));
-GateSequence2 = (sum b:Bool.gateSensor1(b).((b==false) ->  closeGate(G1).GateSequence3 <> GateSequence2));
+
+GateSequence0 = (sum b:Bool.gateState1(b).((b==true) -> GateSequence2 <> GateSequence0_1));
+GateSequence2 = closeGate(G1).GateSequence0_1;
+
+GateSequence0_1 = (sum b:Bool.gateState0(b).((b==true) -> GateSequence1 <> GateSequence3));
+GateSequence1 = closeGate(G0).GateSequence3;
+
 GateSequence3 = g_sendToMaster(gateNoneReady).GateController;
 
 %---------------------------------------------------------------------------------------------------------------------------------
