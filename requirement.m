@@ -4,15 +4,15 @@
 [true*.openGate(G0).!gateState0(false))*.openGate(G1)]false &&
 
 %-------------------------------------------------------------------
-[!(valveState1(false))*.openValve(V0)false] &&
+[!(valveState1(false))*.openValve(V0)]false &&
 [true*.openValve(V1).!(valveState1(false))*.openValve(V0)]false &&
 [!(valveState1(false))*.openValve(V0)]false &&
 [true*.openValve(V1).!(valveState1(false))*.openValve(V0)]false &&
 
 %-------------------------------------------------------------------
-[!(valveState1(false))*.openGate(G0)false] &&
+[!(valveState1(false))*.openGate(G0)]false &&
 [true*.openValve(V1).!(valveState1(false))*.openGate(G0)]false &&
-[!(valveState0(false))*.openGate(G1)false] &&
+[!(valveState0(false))*.openGate(G1)]false &&
 [true*.openValve(V0).!(valveState0(false))*.openGate(G1)]false &&
 
 %-------------------------------------------------------------------
@@ -27,38 +27,38 @@
 
 %-------------------------------------------------------------------
 [true*.!(compareWaterLevel0).openGate(G0)]false &&
-[true*.!(compareWaterLevel1).openGate(G1)]false 
+[true*.!(compareWaterLevel1).openGate(G1)]false && 
 
 %-------------------------------------------------------------------
-%true*.passSignal(0, true).!(haltSignal(0, false))false
-%true*.passSignal(1, true).!(haltSignal(1, false))false
-%true*.passSignal(2, true).!(haltSignal(2, false))false
-%true*.passSignal(3, true).!(haltSignal(3, false))false
+[true*.passSignalOn(S00).!(haltSignalOff(S00))]false &&
+[true*.passSignalOn(S01).!(haltSignalOff(S01))]false &&
+[true*.passSignalOn(S10).!(haltSignalOff(S10))]false &&
+[true*.passSignalOn(S11).!(haltSignalOff(S11))]false &&
 
 %-------------------------------------------------------------------
-%true*.haltSignal(0, true).!(passSignal(0, false))false
-%true*.haltSignal(1, true).!(passSignal(1, false))false
-%true*.haltSignal(2, true).!(passSignal(2, false))false
-%true*.haltSignal(3, true).!(passSignal(3, false))false
+[true*.haltSignalOn(S00).!(passSignalOff(S00))]false &&
+[true*.haltSignalOn(S01).!(passSignalOff(S01))]false &&
+[true*.haltSignalOn(S10).!(passSignalOff(S10))]false &&
+[true*.haltSignalOn(S11).!(passSignalOff(S11))]false &&
 
 %-------------------------------------------------------------------
-%true*.!(haltSignal(0, true)).passSignal(0, false)false
-%true*.!(haltSignal(1, true)).passSignal(1, false)false
-%true*.!(haltSignal(2, true)).passSignal(2, false)false
-%true*.!(haltSignal(3, true)).passSignal(3, false)false
+[true*.!(haltSignalOn(S00)).passSignalOff(S00)]false &&
+[true*.!(haltSignalOn(S01)).passSignalOff(S01)]false &&
+[true*.!(haltSignalOn(S10)).passSignalOff(S10)]false &&
+[true*.!(haltSignalOn(S11)).passSignalOff(S11)]false &&
 
 %-------------------------------------------------------------------
-%true*.!(passSignal(0, true)).haltSignal(0, false)false
-%true*.!(passSignal(1, true)).haltSignal(1, false)false
-%true*.!(passSignal(2, true)).haltSignal(2, false)false
-%true*.!(passSignal(3, true)).haltSignal(3, false)false
+[true*.!(passSignalOn(S00)).haltSignalOff(S00)]false &&
+[true*.!(passSignalOn(S01)).haltSignalOff(S01)]false &&
+[true*.!(passSignalOn(S10)).haltSignalOff(S10)]false &&
+[true*.!(passSignalOn(S11)).haltSignalOff(S11)]false &&
 
 %-------------------------------------------------------------------
-%!(gateState1(true))*.passSignal(2, true)false &&
-%true*.closeGate(G1).!(gateState1(false))*.passSignal(2, true)false
-%!(gateState0(true))*.passSignal(0, true)false &&
-%true*.closeGate(G0).!(gateState0(false))*.passSignal(0, true)false
+%!(gateState1(true))*.passSignalOn(2)]false &&
+%[true*.closeGate(G1).!(gateState1(false))*.passSignalOn(2)]false
+%!(gateState0(true))*.passSignalOn(0)]false &&
+%[true*.closeGate(G0).!(gateState0(false))*.passSignalOn(0)]false
 
 %-------------------------------------------------------------------
-%true*.!(shipPresence(Pnone, false)).passSignal(3, true)false
-%true*.!(shipPresence(Pnone, false)).passSignal(1, true)false
+%[true*.!(shipPresence(Pnone, false)).passSignalOn(3)]false
+%[true*.!(shipPresence(Pnone, false)).passSignalOn(1)]false
