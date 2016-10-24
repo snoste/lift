@@ -1,0 +1,26 @@
+%R01.mcf
+	[!gateState1(false)*.openGate(G0)]false
+	[true*.openGate(G1).gateState1(false).openGate(G0)]false
+
+	%[!gateState0(false)*.openGate(G1)]false &&
+	%[true*.openGate(G0).gateState0(false)*openGate(G1)]false
+
+%R02.mcf
+	[!valveState1(false)*.openValve(V0)]false
+	[true*.openValve(V1).valveState1(false).openValve(V0)]false
+
+	%[!valveState0(false)*.openValve(V1)]false
+	%[true*.openValve(V0).valveState0(false).openValve(V1)]false
+
+%R03.mcf
+	[!valveState1(false)*.openGate(G0)]false
+	[true*.openValve(V1).valveState1(false).openGate(G0)]false
+
+%R04.mcf
+	[!valveState1(false)*.openValve(V0)]false
+	[true*.openValve(V1).valveState1(false).openValve(V0)]false
+
+%R05.mcf
+
+
+%R06.mcf	
