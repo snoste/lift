@@ -1,146 +1,144 @@
 \section{System Verification}
+The aim of this chapter is to verify the rightness of the model by putting the translation of the requirements into code of the requirement translations into a .mcf file. This .mcf file is then run over the mCRL2 model and should return true for every requirement if it satisfies these requirements. The 
 \subsection{Safety}
 \subsubsection{Only one gate can be open at a time}
-\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after gateState$_j$($ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$:}
-	\begin{itemize}
-		\item ~[$\overline{\textrm{gateState$_j$(false)}}$*.openGate(gateID$_i$)]false
-		\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState$_j$(false)}}$*.openGate(gateID$_i$)]false
-	\end{itemize}	
-	
-\subsubsection{Only one valve can be open at a time}
-\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after \linebreak valveState$_j$($ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$:}
-	\begin{itemize}
-		\item ~[$\overline{\textrm{valveState$_j$(false)}}$*.openValve(valveID$_i$)]false
-		\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState$_j$(false)}}$*.openValve(valveID$_i$)]false
-	\end{itemize}
-	
-\subsubsection{A valve and a gate at different levels can never be open at the same time}
-\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after valveState$_j$($ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for gate $i$ and valve $j$ are on opposite sides of the lift:}
-	\begin{itemize}
-		\item ~[$\overline{\textrm{valveState$_j$(false)}}$*.openGate(gateID$_i$)]false
-		\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState$_j$(false)}}$*.openGate(gateID$_i$)]false
-	\end{itemize}
+\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after gateState(gateID$_j$, $ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$:}
+\begin{itemize}
+	\item ~[$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openGate(gateID$_i$)]false
+	\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openGate(gateID$_i$)]false
+\end{itemize}	
 
-\noindent\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after gateState$_j$($ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for valve $i$ and gate $j$ are on opposite sides of the lift:}
-	\begin{itemize}
-		\item ~[$\overline{\textrm{gateState$_j$(false)}}$*.openValve(valveID$_i$)]false
-		\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState$_j$(false)}}$*.openValve(valveID$_i$)]false
-	\end{itemize}
-	
+\subsubsection{Only one valve can be open at a time}
+\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after valveState(valveID$_j$, $ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for valveID$_i \neq$ valveID$_j$:}
+\begin{itemize}
+	\item ~[$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openValve(valveID$_i$)]false
+	\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openValve(valveID$_i$)]false
+\end{itemize}
+
+\subsubsection{A valve and a gate at different levels can never be open at the same time}
+\textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after valveState(valveID$_j$, $ b $) delivers $b = false$ and openValve(valveID$_j$) has not been issued in the meantime, for gate $i$ and valve $j$ are on opposite sides of the lift:}
+\begin{itemize}
+	\item ~[$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openGate(gateID$_i$)]false
+	\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{valveState(valveID$_j$, false)}}$*.openGate(gateID$_i$)]false
+\end{itemize}
+
+\textit{It is only possible to send an openValve(valveID$_i$) to open valve $i$ after gateState(gateID$_j$, $ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for valve $i$ and gate $j$ are on opposite sides of the lift:}
+\begin{itemize}
+	\item ~[$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
+	\item ~[true*.openGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
+\end{itemize}
+
 \subsubsection{A gate can only close if there is no ship in between its doors}
-\textit{It is only possible to send closeGate(gateID$_i$) to close gate $i$ after gateSensor$_i$($b$) delivers $b = false$ and no other action has been issued in the meantime:}
-	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{gateSensor$_i$(false)}}$.closeGate(gateID$_i$)]false
-	\end{itemize}
-	
+\textit{It is only possible to send closeGate(gateID$_i$) to close gate $i$ after gateSensor(gateID$_i$, $b$) delivers $b = false$ and no other action has been issued in the meantime:}
+\begin{itemize}
+	\item ~[true*.$\overline{\textrm{gateSensor(gateID$_i$, false)}}$.closeGate(gateID$_i$)]false
+\end{itemize}
+
 \subsubsection{A gate can only open if the water level on both sides is equal}
-\textit{It is only possible to send openGate(gateID$_i$) to open gate $i$ after \linebreak compareWaterLevel$_j$($b$) delivers $b = true$ and no other action has been issued in the meantime, for gate $i$ and container $j$ are on the same side of the lift:}
-	\begin{itemize}
-		\item $\overline{\textrm{compareWaterLevel$_j$(true)}}$.openGate(gateID$_i$)]false
-		\item ~[true*.openValve(valveID$_j$).$\overline{\textrm{compareWaterLevel$_j$(true)}}$.openGate(gateID$_i$)]false
-	\end{itemize}
+%TODO: Allow other actions before openGate, see mcf reqs
+\textit{It is only possible to send openGate(gateID$_i$) to open gate $i$ after \linebreak compareWaterlevel(containerID$_j$, $b$) delivers $b = true$ and no other action has been issued in the meantime, for gate $i$ and container $j$ are on the same side of the lift:}
+\begin{itemize}
+	\item ~[true*.$\overline{\textrm{compareWaterlevel(containerID$_j$, true)}}$.openGate(gateID$_i$)]false
+\end{itemize}
 
 \subsubsection{Signal lights can never be off nor indicate hold and pass at the same time}
-\textit{passSignalOn(signalID$_i$) has to be followed directly by haltSignalOff(signalID$_i$):}
-	\begin{itemize}
-		\item ~[true*.passSignalOn(signalID$_i$).$\overline{\textrm{haltSignalOff(signalID$_i$)}}$]false
-	\end{itemize}
-\textit{haltSignalOn(signalID$_i$) has to be followed directly by passSignalOff(signalID$_i$):}
-	\begin{itemize}
-		\item ~[true*.haltSignalOn(signalID$_i$).$\overline{\textrm{passSignalOff(signalID$_i$)}}$]false
-	\end{itemize}
-\textit{passSignalOff(signalID$_i$) can only be issued directly after haltSignalOn(signalID$_i$):}
-	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{haltSignalOn(signalID$_i$)}}$.passSignalOff(signalID$_i$)]false
-	\end{itemize}
-\textit{haltSignalOff(signalID$_i$) can only be issued directly after passSignalOn(signalID$_i$):}
-	\begin{itemize}
-		\item ~[true*.$\overline{\textrm{passSignalOn(signalID$_i$)}}$.haltSignalOff(signalID$_i$)]false
-	\end{itemize}
+\textit{passSignal(signalID$_i$, true) has to be followed directly by haltSignal(signalID$_i$, false):}
+\begin{itemize}
+	\item ~[true*.passSignal(signalID$_i$, true).$\overline{\textrm{haltSignal(signalID$_i$, false)}}$]false
+\end{itemize}
+\textit{haltSignal(signalID$_i$, true) has to be followed directly by passSignal(signalID$_i$, false):}
+\begin{itemize}
+	\item ~[true*.haltSignal(signalID$_i$, true).$\overline{\textrm{passSignal(signalID$_i$, false)}}$]false
+\end{itemize}
+\textit{passSignal(signalID$_i$, false) can only be issued directly after haltSignal(signalID$_i$, true):}
+\begin{itemize}
+	\item ~[true*.$\overline{\textrm{haltSignal(signalID$_i$, true)}}$.passSignal(signalID$_i$, false)]false
+\end{itemize}
+\textit{haltSignal(signalID$_i$, false) can only be issued directly after passSignal(signalID$_i$, true):}
+\begin{itemize}
+	\item ~[true*.$\overline{\textrm{passSignal(signalID$_i$, true)}}$.haltSignal(signalID$_i$, false)]false
+\end{itemize}
 
 \subsubsection{Signal lights can only indicate pass if the gate is completely opened}
-\textit{It is only possible to send passSignalOn(signalID$_i$) to set signal $i$ to pass after a gateState$_j$($ b $) delivers $b = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift:}
-	\begin{itemize}
-		\item ~[$\overline{\textrm{gateState$_j$(true)}}$*.passSignalOn(signalID$_i$)]false
-		\item ~[true*.closeGate(gateID$_j$).$\overline{\textrm{gateState$_j$(true)}}$*.passSignalOn(signalID$_i$)]false
-	\end{itemize}
-	
-\subsubsection{An entering signal can only indicate pass if there is no ship in the lift already}
-\textit{It is only possible to send passSignalOn(signalID$_i$) to set the entering signal $i$ to pass after boatExitUp or boatExitDown and no neither goToPos00 nor goToPos10 have been issued in the meantime:}\vspace{0.3cm}
+\textit{It is only possible to send passSignal(signalID$_i$, true) to set signal $i$ to pass after a gateState(gateID$_j$, $ b $) delivers $b = true$ and closeGate(gateID$_j$) has not been issued in the meantime, for signal $i$ and gate $j$ are on the same side of the lift:}
+\begin{itemize}
+	\item ~[$\overline{\textrm{gateState(gateID$_j$, true)}}$*.passSignal(signalID$_i$, true)]false
+	\item ~[true*.closeGate(gateID$_j$).$\overline{\textrm{gateState(gateID$_j$, false)}}$*.openValve(valveID$_i$)]false
+\end{itemize}
 
-	$\bullet$ ~[true*.(goToPos00 $||$ goToPos10).!(boatExitUp $||$ boatExitDown)*.
-		\begin{flushright}
-			passSignalOn(SignalID$_i$)]false
-		\end{flushright}
+\subsubsection{An entering signal can only indicate pass if there is no ship in the lift already}
+\textit{It is only possible to send passSignal(signalID$_i$, true) to set the entering signal $i$ to pass after shipPresence(posID$_{X.1}$, $b$) delivers $b = false$ and no other action has been issued in the meantime, for posID$_{X.1}$ is the ID of container X.1:}
+\begin{itemize}
+	\item ~[true*.$\overline{\textrm{shipPresence(posID$_{X.1}$, false)}}$.passSignal(signalID$_i$, true)]false
+\end{itemize}
 
 %--------------------------------------------------------------------------------------------------------------------------------------------%
 %																FUNCTIONALITY
 %--------------------------------------------------------------------------------------------------------------------------------------------%
-\begin{comment}
+
 \subsection{Functionality}
 \subsubsection{If a ship has just left the system and there is no other boat waiting, the system should enter idle state:}
 \textit{If shipPresence(posID$_i$, $b$) returns $b = false$ for all position IDs posID$_i$:}
+\begin{itemize}
+	\item \textit{For all gate IDs gateID$_i$: If gateState(gateID$_i$, $b$) returns $b = true$, \linebreak closeGate(gateID$_i$) must be issued}
 	\begin{itemize}
-		\item \textit{For all gate IDs gateID$_i$: If gateState(gateID$_i$, $b$) returns $b = true$, \linebreak closeGate(gateID$_i$) must be issued}
-		\begin{itemize}
-			\item ~[true*.gateState(gateID$_i$, true).$\overline{\textrm{closeGate(gateID$_i$)}}$]false
-		\end{itemize}
-		\item \textit{For all signal IDs signalID$_i$: If signalState(signalID$_i$, $b$) returns $b = true$, haltSignal(signalID$_i$, true) must be issued}
-		\begin{itemize}
-			\item ~[true*.signalState(signalID$_i$, true).$\overline{\textrm{haltSignal(signalID$_i$, true)}}$]false
-		\end{itemize}
-		\item \textit{Otherwise only shipPresence(posID$_i$, $b$) action must happen}
-		\begin{itemize}
-			\item ~[true*.$\overline{\textrm{shipPresence(posID$_i$, b)}}$]false
-		\end{itemize}
+		\item ~[true*.gateState(gateID$_i$, true).$\overline{\textrm{closeGate(gateID$_i$)}}$]false
 	\end{itemize}
-	
+	\item \textit{For all signal IDs signalID$_i$: If signalState(signalID$_i$, $b$) returns $b = true$, haltSignal(signalID$_i$, true) must be issued}
+	\begin{itemize}
+		\item ~[true*.signalState(signalID$_i$, true).$\overline{\textrm{haltSignal(signalID$_i$, true)}}$]false
+	\end{itemize}
+	\item \textit{Otherwise only shipPresence(posID$_i$, $b$) action must happen}
+	\begin{itemize}
+		\item ~[true*.$\overline{\textrm{shipPresence(posID$_i$, b)}}$]false
+	\end{itemize}
+\end{itemize}
+
 \subsubsection{If there is no ship in the lift the first ship to arrive in the system should get served first}
 \textit{While the system is idle, it should check for arriving ships periodically using the shipPresence(posID$_i$, $b$) action for all position IDs posID$_i$. If $b = true$ for one position posID$_i \neq X.1$, the system should issue passSignal(signalID$_i$, true) where signalID$_i$ is the entering signal light at the detected ship's position:}\vspace{0.3cm}
 
-		% [true*.a]uX.([!b]X && <true>true) -> after an a, b will always happen at some point:
-		$ \bullet $ [true*.shipPresence(posID$_i$, true)]$ \mu X$.(
-			\begin{flushright}
-				~[$ \overline{\textrm{passSignal(signalID$_i$, true)}} ]X \wedge <$true$>$true)
-			\end{flushright}
-	
+% [true*.a]uX.([!b]X && <true>true) -> after an a, b will always happen at some point:
+$ \bullet $ [true*.shipPresence(posID$_i$, true)]$ \mu X$.(
+\begin{flushright}
+	~[$ \overline{\textrm{passSignal(signalID$_i$, true)}} ]X \wedge <$true$>$true)
+\end{flushright}
+
 \subsubsection{If a ship has just left the system and there are boats waiting on one side of the lift, the first boat in line gets served}
 \textit{If shipPresence(posID$_i$, $b$) returns $b = true$ for one position posID$_i \neq X.1$, the system should issue passSignal(signalID$_i$, true) where signalID$_i$ is the entering signal light at position posID$_i$:}\vspace{0.3cm}
 
-		$ \bullet $ [true*.shipPresence(posID$_i$, true)]$ \mu X$.(
-		\begin{flushright}
-			~[$ \overline{\textrm{passSignal(signalID$_i$, true)}} ]X \wedge <$true$>$true)
-		\end{flushright}
-	
+$ \bullet $ [true*.shipPresence(posID$_i$, true)]$ \mu X$.(
+\begin{flushright}
+	~[$ \overline{\textrm{passSignal(signalID$_i$, true)}} ]X \wedge <$true$>$true)
+\end{flushright}
+
 \subsubsection{If a ship has just left the system and there are boats waiting on both sides of the lift, then the first boat on the current level gets served}
-\textit{If both, shipPresence(posID$_i$, $b$) and shipPresence(posID$_j$, $b$) return $b = true$ for posID$_i \neq$ posID$_j \neq$ posID$_{X.1}$, the system should check the current waterlevel in container X.1 using compareWaterLevel(containerID$_i$, $b_i$) and \linebreak compareWaterLevel(containerID$_j$, $b_j$) (containerID$_i \neq$ containerID$_j \neq$ \linebreak containerID$_{X.1}$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the entering signal light at container $k$ and
-		\begin{equation*}
-		k = 
-		\begin{cases}
-		i & \text{if } b_i = true\\
-		j & \text{if } b_j = true\\
-		\end{cases}
-		\end{equation*}
+\textit{If both, shipPresence(posID$_i$, $b$) and shipPresence(posID$_j$, $b$) return $b = true$ for posID$_i \neq$ posID$_j \neq$ posID$_{X.1}$, the system should check the current waterlevel in container X.1 using compareWaterlevel(containerID$_i$, $b_i$) and \linebreak compareWaterlevel(containerID$_j$, $b_j$) (containerID$_i \neq$ containerID$_j \neq$ \linebreak containerID$_{X.1}$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the entering signal light at container $k$ and
+	\begin{equation*}
+	k = 
+	\begin{cases}
+	i & \text{if } b_i = true\\
+	j & \text{if } b_j = true\\
+	\end{cases}
+	\end{equation*}
 }\vspace{0.3cm}
 
 $ \bullet $ [true*.shipPresence(posID$_i$, true)]$ \mu X$.(
 \begin{flushright}
 	~[$ \overline{\textrm{passSignal(signalID$_k$, true)}} ]X \wedge <$true$>$true)
 \end{flushright}
-	
+
 \subsubsection{If a ship hast just entered the lift the system should transport the ship to the other level}
-\textit{Once a ship has entered container X.1 (shipPresence(posID$_{X.1}$, $b$) results in $b = true$ for the first time after returning $b = false$), it should check the current waterlevel in container X.1 using compareWaterLevel(containerID$_i$, $b_i$) and \linebreak compareWaterLevel(containerID$_j$, $b_j$) (containerID$_i \neq$ containerID$_j \neq$ \linebreak containerID$_{X.1}$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the leaving signal light at container $k$ and
-		\begin{equation*}
-		k = 
-		\begin{cases}
-		i & \text{if } b_i = true\\
-		j & \text{if } b_j = true\\
-		\end{cases}
-		\end{equation*}
+\textit{Once a ship has entered container X.1 (shipPresence(posID$_{X.1}$, $b$) results in $b = true$ for the first time after returning $b = false$), it should check the current waterlevel in container X.1 using compareWaterlevel(containerID$_i$, $b_i$) and \linebreak compareWaterlevel(containerID$_j$, $b_j$) (containerID$_i \neq$ containerID$_j \neq$ \linebreak containerID$_{X.1}$) and then issue passSignal(signalID$_k$, true) where signalID$_k$ is the leaving signal light at container $k$ and
+	\begin{equation*}
+	k = 
+	\begin{cases}
+	i & \text{if } b_i = true\\
+	j & \text{if } b_j = true\\
+	\end{cases}
+	\end{equation*}
 }\vspace{0.3cm}
 
 $ \bullet $ [true*.shipPresence(posID$_{X.1}$, true)]$ \mu X$.(
 \begin{flushright}
 	~[$ \overline{\textrm{passSignal(signalID$_k$, true)}} ]X \wedge <$true$>$true)
-\end{flushright}}
-\end{comment}
+\end{flushright}
