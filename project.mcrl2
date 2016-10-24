@@ -79,7 +79,10 @@ openGate, 	 closeGate: GateID;
 openValve, 	 closeValve: ValveID;
 gateSensor0, gateSensor1, gateState0, gateState1, valveState0, valveState1, compareWaterLevel1, compareWaterLevel0:Bool;
 haltSignal,  passSignal: SLID;
+passSignalOn, passSignalOff, haltSignalOn, haltSignalOff: SLID;
 sensePosition: PositionID;
+
+sflksda =  sum slid:SLID haltSignal(slid).( slid == S00 )
 
 %goToPos00, goToPos01, goToPos11, gotToPos10;
 goToPos00,goToPos01, goToPos10, goToPos11, boatExit,boatExitUp, boatExitDown;
@@ -217,11 +220,10 @@ GateClose0_2 =  g_sendToMaster(gateReady1).GateController;
 
 
 GateSequence0 = (sum b:Bool.gateState1(b).((b==true) -> GateSequence2 <> GateSequence0_1));
-GateSequence2 = closeGate(G1).GateSequence0_1;
+GateSequence2 = (sum b:Bool.gateSensor1(b).((b==false) -> closeGate(G1).GateSequence0_1 <> GateSequence2));
 
 GateSequence0_1 = (sum b:Bool.gateState0(b).((b==true) -> GateSequence1 <> GateSequence3));
-GateSequence1 = closeGate(G0).GateSequence3;
-
+GateSequence1 = (sum b:Bool.gateSensor0(b).((b==false) -> closeGate(G0).GateSequence3 <> GateSequence1));
 GateSequence3 = g_sendToMaster(gateNoneReady).GateController;
 
 %---------------------------------------------------------------------------------------------------------------------------------
@@ -232,12 +234,27 @@ SignalController = (sum receive:M2S.s_recFromMaster(receive).(
 		(isSignalSetPass11(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S11).s_sendToMaster(signalReadyS11).SignalController) <> SignalController+
 		(isSignalSetPass10(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S10).s_sendToMaster(signalReadyS10).SignalController) <> SignalController+
 		(isSignalSetHaltAll(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).s_sendToMaster(signalReadyHaltAll).SignalController) <> SignalController));
+
+
+
+%haltSignalS00 = S00red_on.S00green_off;
+%passSignal00 = S00red_on
 %---------------------------------------------------------------------------------------------------------------------------------
 %ValveController
 ValveController = sum receive:M2V.v_recFromMaster(receive).(
 				%check if message from master is received %close valve v1 in case we want to open v1  %check water level end send if everithink ok a valve ready message, otherwise error message
-					((isSetWaterLevel1(receive)==true) -> closeValve(V0).(sum b:Bool.valveState1(b).((b==false) -> openValve(V1).compare1.ValveController <> compare1.ValveController) )) +
-					((isSetWaterLevel0(receive)==true) -> closeValve(V1).(sum b:Bool.valveState0(b).((b==false) -> openValve(V0).compare0.ValveController <> compare0.ValveController) )));
+					((isSetWaterLevel1(receive)==true) -> closeValve0  ) +
+					((isSetWaterLevel0(receive)==true) -> closeValve1 ));
+
+closeValve0=(sum b:Bool.valveState0(b).((b==true)-> closeValve(V0).closeValve0_2 <>closeValve0_1));
+closeValve1=(sum b:Bool.valveState1(b).((b==true)-> closeValve(V1).closeValve1_2 <>closeValve1_1));
+
+closeValve0_2=closeValve0;
+closeValve1_2=closeValve1;
+
+closeValve0_1=(sum b:Bool.valveState1(b).((b==false) -> openValve(V1).compare1 <> compare1));
+closeValve1_1=(sum b:Bool.valveState0(b).((b==false) -> openValve(V0).compare0 <> compare0));
+
 
 compare1 =	(sum b:Bool.compareWaterLevel1(b).((b==true) ->  v_sendToMaster(valveReady1).ValveController <> compare1));
 compare0 =	(sum b:Bool.compareWaterLevel0(b).((b==true) ->  v_sendToMaster(valveReady0).ValveController <> compare0));
