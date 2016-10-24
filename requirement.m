@@ -1,5 +1,5 @@
 [(!gateState1(false))*.openGate(G0)]false &&
-[true*.openGate(G1).(!gateState1(false))*.openGate(G0)]false && 
+[true*.openGate(G1).(!gateState1(false))*.openGate(G0)]false &&
 [!(gateState0(false))*.openGate(G1)]false &&
 [true*.openGate(G0).!gateState0(false))*.openGate(G1)]false &&
 
@@ -27,7 +27,7 @@
 
 %-------------------------------------------------------------------
 [true*.!(compareWaterLevel0).openGate(G0)]false &&
-[true*.!(compareWaterLevel1).openGate(G1)]false && 
+[true*.!(compareWaterLevel1).openGate(G1)]false &&
 
 %-------------------------------------------------------------------
 [true*.passSignalOn(S00).!(haltSignalOff(S00))]false &&
