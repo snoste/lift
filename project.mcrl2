@@ -82,8 +82,6 @@ haltSignal,  passSignal: SLID;
 passSignalOn, passSignalOff, haltSignalOn, haltSignalOff: SLID;
 sensePosition: PositionID;
 
-sflksda =  sum slid:SLID haltSignal(slid).( slid == S00 )
-
 %goToPos00, goToPos01, goToPos11, gotToPos10;
 goToPos00,goToPos01, goToPos10, goToPos11, boatExit,boatExitUp, boatExitDown;
 
@@ -237,7 +235,7 @@ SignalController = (sum receive:M2S.s_recFromMaster(receive).(
 
 haltSignalS00 = haltSignalOn(S00).passSignalOff(S00);
 haltSignalS01 = haltSignalOn(S01).passSignalOff(S01);
-haltSignalS01 = haltSignalOn(S10).passSignalOff(S10);
+haltSignalS10 = haltSignalOn(S10).passSignalOff(S10);
 haltSignalS11 = haltSignalOn(S11).passSignalOff(S11);
 
 passSignalS00 = passSignalOn(S00).haltSignalOff(S00);
