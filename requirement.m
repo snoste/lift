@@ -57,10 +57,10 @@
 [true*.!(passSignalOn(S11)).haltSignalOff(S11)]false &&
 
 %-------------------------------------------------------------------
-[!(gateState1(false))*.passSignalOn(S00)]false &&
-[!(gateState0(false))*.passSignalOn(S10)]false &&
-[true*.closeGate(G1).!(gateState1(false))*.passSignalOn(S00)]false &&
-[true*.closeGate(G0).!(gateState0(false))*.passSignalOn(S10)]false &&
+[!(gateState1(true))*.passSignalOn(S00)]false &&
+[!(gateState0(true))*.passSignalOn(S10)]false &&
+[true*.closeGate(G1).!(gateState1(true))*.passSignalOn(S00)]false &&
+[true*.closeGate(G0).!(gateState0(true))*.passSignalOn(S10)]false &&
 
 %-------------------------------------------------------------------
 [true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S01)]false &&
