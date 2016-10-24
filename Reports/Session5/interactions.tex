@@ -1,10 +1,9 @@
 \section{Interactions}
-This chapter identifies interactions of the system to be able to model
+This chapter identifies interactions of the system in both commands and signals. These are necessary to be able to model the system later in the mCRL2 standard. Apart from the Action or Signal name also the parameters are displayed inside the tables:
 
 \subsection{Commands}
 \begin{table}[htbp]
 	\centering
-	\caption{Commands are given by the controller to the lift components and the ship operator/captain}
 	\begin{tabular}{lll}
 		\toprule
 		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
@@ -23,65 +22,62 @@ This chapter identifies interactions of the system to be able to model
 		passSignalOff & Turn the given pass signal light off & SLID\\
 		haltSignalOn & Turn the given halt signal light on & SLID\\
 		haltSignalOff & Turn the given halt signal light off & SLID\\
-
-\bottomrule
-\end{tabular}%
-\label{tab:addlabel}%
+		
+		\bottomrule
+	\end{tabular}%
+	\label{tab:addlabel}%
+	\caption{Commands are given by the controller to the lift components and the boat captain}
 \end{table}%
-		
-		
-		
 
 
-		
-		\subsection{Signals}
-		\begin{table}[htbp]
-			\centering
-			\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
-			\begin{tabular}{lp{6cm}l}
-				\toprule
-				\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
-				\hline
-				gateState0 & Returns open (true) or closed (false) in relation to the Gate 0 state &  $ \mathbb{B} $ \\
-				gateState1 & Returns open (true) or closed (false) in relation to the Gate 0 state &  $ \mathbb{B} $ \\
-				valveState0 & Returns open (true) or closed (false) in relation to the Valve 0 state &  $ \mathbb{B} $ \\
-				valveState1 & Returns open (true) or closed (false) in relation to the Valve 1 state &  $ \mathbb{B} $ \\
-				compareWaterlevel0 & Compare the water level of the lower containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
-				compareWaterlevel1 & Compare the water level of the upper containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
-				gateSensor0 &  Returns true if something is inbetween the gate 0, otherwise false &  $ \mathbb{B} $ \\
-				gateSensor1 &  Returns true if something is inbetween the gate 1, otherwise false &  $ \mathbb{B} $ \\
-				sensePosition  & Returns the position ID of the presence of ships otherwise Pnone meaning no ships & posID \\
-				\bottomrule
-			\end{tabular}%
-				\label{tab:addlabel}%
-				\end{table}%
-	
-			
-			
-			\begin{table}[htbp]
-				\centering
-				\caption{)}
-				\begin{tabular}{lp{6cm}l}
-					\toprule
-					\textbf{Parameter} & \textbf{Specification} & \textbf{Description} \\
-					\hline
-					SLID & S00 &  Signal 00 identifier\\
-					SLID & S01 &  Signal 01 identifier\\
-					SLID  & S10 &  Signal 10 identifier\\
-					SLID  & S00 &  Signal 11 identifier\\
-					SLID    & S\_none &  identify no signal\\
-					ValveID & V0 &  Valve 0 identifier\\
-					ValveID & V1 &  Valve 1 identifier\\
-					GateID & G0 &  Gate 0 identifier\\
-					GateID & G1 &  Gate 1 identifier\\
-					PositionID & P00 &  Position 00 identifier\\
-					PositionID & P10 &  Position 10 identifier\\
-					PositionID   & Pnone &  identify no position\\
-					
-				\end{tabular}%
-				\label{tab:addlabel}%
-			\end{table}%
-			
-				
 
-				
+
+\subsection{Signals}
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lp{6cm}l}
+		\toprule
+		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
+		\hline
+		gateState0 & Returns open (true) or closed (false) in relation to the Gate 0 state &  $ \mathbb{B} $ \\
+		gateState1 & Returns open (true) or closed (false) in relation to the Gate 1 state &  $ \mathbb{B} $ \\
+		valveState0 & Returns open (true) or closed (false) in relation to the Valve 0 state &  $ \mathbb{B} $ \\
+		valveState1 & Returns open (true) or closed (false) in relation to the Valve 1 state &  $ \mathbb{B} $ \\
+		compareWaterlevel0 & Compare the water level of the lower containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
+		compareWaterlevel1 & Compare the water level of the upper containers. Equal (true) or unequal (false) &  $ \mathbb{B} $ \\
+		gateSensor0 &  Returns true if something is inbetween the gate 0, otherwise false &  $ \mathbb{B} $ \\
+		gateSensor1 &  Returns true if something is inbetween the gate 1, otherwise false &  $ \mathbb{B} $ \\
+		sensePosition  & Returns the position ID of the presence of ships otherwise Pnone meaning no ships & posID \\
+		\bottomrule
+	\end{tabular}%
+	\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
+	\label{tab:addlabel}%
+\end{table}%
+
+\begin{table}[htbp]
+	\centering
+	\begin{tabular}{lp{6cm}l}
+		\toprule
+		\textbf{Parameter} & \textbf{Specification} & \textbf{Description} \\
+		\hline
+		SLID & S00 &  Signal 00 identifier\\
+		SLID & S01 &  Signal 01 identifier\\
+		SLID  & S10 &  Signal 10 identifier\\
+		SLID  & S00 &  Signal 11 identifier\\
+		SLID    & S\_none &  identify no signal\\
+		ValveID & V0 &  Valve 0 identifier\\
+		ValveID & V1 &  Valve 1 identifier\\
+		GateID & G0 &  Gate 0 identifier\\
+		GateID & G1 &  Gate 1 identifier\\
+		PositionID & P00 &  Position 00 identifier\\
+		PositionID & P10 &  Position 10 identifier\\
+		PositionID   & Pnone &  identify no position\\
+		\bottomrule
+	\end{tabular}%
+	\caption{Parameter Data elements description)}
+	\label{tab:addlabel}%
+\end{table}%
+
+
+
+
