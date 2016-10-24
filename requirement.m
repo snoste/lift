@@ -1,25 +1,25 @@
 %------------------------------------------------------------------- TRUE
 [(!gateState1(false))*.openGate(G0)]false &&
-[true*.openGate(G1).(!gateState1(false))*.openGate(G0)]false &&
 [!(gateState0(false))*.openGate(G1)]false &&
+[true*.openGate(G1).(!gateState1(false))*.openGate(G0)]false &&
 [true*.openGate(G0).(!gateState0(false))*.openGate(G1)]false &&
 
 %------------------------------------------------------------------- TRUE
 [!(valveState1(false))*.openValve(V0)]false &&
+[!(valveState0(false))*.openValve(V1)]false &&
 [true*.openValve(V1).!(valveState1(false))*.openValve(V0)]false &&
-[!(valveState1(false))*.openValve(V0)]false &&
-[true*.openValve(V1).!(valveState1(false))*.openValve(V0)]false &&
+[true*.openValve(V1).!(valveState0(false))*.openValve(V1)]false &&
 
 %------------------------------------------------------------------- TRUE
 [!(valveState1(false))*.openGate(G0)]false &&
-[true*.openValve(V1).!(valveState1(false))*.openGate(G0)]false &&
 [!(valveState0(false))*.openGate(G1)]false &&
 [true*.openValve(V0).!(valveState0(false))*.openGate(G1)]false &&
+[true*.openValve(V1).!(valveState1(false))*.openGate(G0)]false &&
 
 %------------------------------------------------------------------- TRUE
 [!(valveState1(false))*.openGate(G0)]false &&
-[true*.openValve(V1).(!valveState1(false))*.openGate(G0)]false &&
 [!(valveState0(false))*.openGate(G1)]false &&
+[true*.openValve(V1).(!valveState1(false))*.openGate(G0)]false &&
 [true*.openValve(V0).(!valveState0(false))*.openGate(G1)]false &&
 
 %------------------------------------------------------------------- TRUE
@@ -28,8 +28,8 @@
 
 %------------------------------------------------------------------- TRUE
 [!(compareWaterLevel0(true))*.openGate(G0)]false &&
-[true*.openValve(V1).!(compareWaterLevel0(true))*.openGate(G0)]false &&
 [!(compareWaterLevel1(true))*.openGate(G1)]false &&
+[true*.openValve(V1).!(compareWaterLevel0(true))*.openGate(G0)]false &&
 [true*.openValve(V0).!(compareWaterLevel1(true))*.openGate(G1)]false &&
 
 %------------------------------------------------------------------- TRUE
@@ -58,8 +58,8 @@
 
 %------------------------------------------------------------------- TRUE
 [!(gateState1(false))*.passSignalOn(S00)]false &&
-[true*.closeGate(G1).!(gateState1(false))*.passSignalOn(S00)]false &&
 [!(gateState0(false))*.passSignalOn(S10)]false &&
+[true*.closeGate(G1).!(gateState1(false))*.passSignalOn(S00)]false &&
 [true*.closeGate(G0).!(gateState0(false))*.passSignalOn(S10)]false &&
 
 %------------------------------------------------------------------- TRUE
