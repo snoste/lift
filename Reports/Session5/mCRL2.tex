@@ -1,30 +1,39 @@
 \section{mCRL System Behaviour Modelling}
-This section is about the the model of the ship lift system in MCRL2 code. In appendix A it is shown the complete code for any clarification.
+This section covers an explanation model and its design for the boat lift model in mCRL2. In Appendix A the code can be seen in full length for further clarification or references, by lines.
 \subsection{The code}
-The code has been divided into the 4 controllers: 1 main controller and 3 sub controllers namely gate, valve and signal controller. The communication between each controller to the main one and vice versa are clarified in Figure \ref{fig:subcontrollers}).
-It has been created a series of sort element has it is shown in the following table \ref{tab:sort}.
-			\begin{table}[htbp]
+The code has been divided into four controllers: one master controller and three sub controllers. Namely gate, valve and signal controller. The communication between each controller to the master and vice versa are clarified in Figure \ref{fig:subcontrollers}.
+There have been created a series of data types which can be seen in Table \ref{tab:sort}.
+
+\begin{table}[htbp]
 	\centering
-	\caption{)}
-	\begin{tabular}{lp{6cm}l}
+	\caption{Sorts/Data types of the model}
+	\begin{tabular}{lp{10.5cm}l}
 		\toprule
 		\textbf{Sort} &  \textbf{Description} \\
 		\hline
-		State&  define states of the main controller \\
-		M2G &  define communication element from master to gate controller\\
-		G2M & define communication element from gate to main controller \\
-		M2S &  define communication element from master to signal controller\\
-		S2M &  define communication element from signal to master controller\\
-		M2V &  define communication element from master to valve controller\\
-		V2M &  define communication element from valve to master controller\\
-		SLID &  define signal light ID elemnt\\
-		GateID &  define gate ID elemnt\\
-		ValveID &  define valve ID elemnt\\
-		PositionID   & define position ID element\\
+		State&  Defines states of the master controller \\
+		M2G &  Defines communication elements from the master to gate controller\\
+		G2M & Defines communication elements from the gate to master controller \\
+		M2S &  Defines communication elements from the master to signal controller\\
+		S2M &  Defines communication elements from the signal to master controller\\
+		M2V &  Defines communication elements from the master to valve controller\\
+		V2M &  Defines communication elements from the valve to master controller\\
+		SLID &  Defines signal light IDs\\
+		GateID &  Defines gate IDs\\
+		ValveID &  Defines valve IDs\\
+		PositionID   & Defines position IDs\\
 		
 	\end{tabular}%
 	\label{tab:sort}%
 \end{table}%
-The main controller has been divided into a series of states. Each states has only one action and then it goes to an other state or create a loop to himself. This loop-mechanism has been created for let the main controller being able to receive proper information about the status of the systems from the other sub-controllers. The initial state of the boat lift has been defined by making the master controller to idle state.\\
-On MCRL2, in the graph and in the view tools it is possible to analyze the system. It is mainly composed by two main branch that start from the idle state, they describe the lift when the boat is going up and on the other branch when the ship is going down. The system is then able to manage one operation at the time and for change branch it is always needed to go to the idle state. This will be very helpful for fulfill all the requirement that are going to be checked on the next section of this paper. Moreover, in the tools is it possible to look that many states has some loops needed for two reasons: for the sub-controllers to check all the boat lift state and for the master for check for response from valve, gate and signal sub controllers.
+The master controller has control over the safety requirements and divides its into a series of states. Each states represents only one action and then it switches to the next state, checking the correctness of the previous state, or it creates a loop to a previous state. The loop can go back to idle or create a more complex loop depending on boats waiting to use the lift. This state forwarding mechanism allows the master controller to receive reliable information about the status of the systems from the other sub-controllers. The initial state of the boat lift is by definition idle state were the lift can expect no boat or no boat on either side.\\
+During the writing of the mCRL2 code, the graph and the view tools were mostly used for analyzing as well as branching bisimulation. When looking at the view in Figure \ref{fig:view}, the system can be analyzed and explained efficiently. The model is mainly composed of two main branches that start from the idle state, they describe a boat going up the lift and a boat going down the lift. The system goes into one state at a time going down the branch. This method is effective to fulfill all requirement which will be checked and verified in Section \ref{sec:ver}. 
+
+\begin{figure}[!h]
+	\includegraphics[width=\linewidth]{view}
+	\caption{The view tool in mCRL2 shows efficiently how the model is structured}
+	\label{fig:view}
+\end{figure}
+
+%Moreover, in the tools is it possible to look that many states has some loops needed for two reasons: for the sub-controllers to check all the boat lift state and for the master for check for response from valve, gate and signal sub controllers.
 
