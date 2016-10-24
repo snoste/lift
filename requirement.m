@@ -17,16 +17,16 @@
 [true*.openValve(V0).!(valveState0(false))*.openGate(G1)]false &&
 
 %------------------------------------------------------------------- FALSE
-%[!(gateState1(false))*.openValve(V0)]false &&
-%[true*.openGate(G1).(!gateState1(false))*.openValve(V0)]false &&
-%[!(gateState0(false))*.openValve(V1)]false &&
-%[true*.openGate(G0).(!gateState0(false))*.openValve(V1)]false
+[!(gateState1(false))*.openValve(V0)]false &&
+[true*.openGate(G1).(!gateState1(false))*.openValve(V0)]false &&
+[!(gateState0(false))*.openValve(V1)]false &&
+[true*.openGate(G0).(!gateState0(false))*.openValve(V1)]false &&
 
 %------------------------------------------------------------------- TRUE
 [true*.!(gateSensor0(false)).closeGate(G0)]false &&
 [true*.!(gateSensor1(false)).closeGate(G1)]false &&
 
-%------------------------------------------------------------------- FALSE
+%------------------------------------------------------------------- TRUE
 [!(compareWaterLevel0(true))*.openGate(G0)]false &&
 [true*.openValve(V1).!(compareWaterLevel0(true))*.openGate(G0)]false &&
 [!(compareWaterLevel1(true))*.openGate(G1)]false &&
