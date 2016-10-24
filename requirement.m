@@ -27,8 +27,10 @@
 [true*.!(gateSensor1(false)).closeGate(G1)]false &&
 
 %------------------------------------------------------------------- FALSE
-%[true*.!(compareWaterLevel0(true)).openGate(G0)]false &&
-%[true*.!(compareWaterLevel1(true)).openGate(G1)]false &&
+[!(compareWaterLevel0(true))*.openGate(G0)]false &&
+[true*.openValve(V1).!(compareWaterLevel0(true))*.openGate(G0)]false &&
+[!(compareWaterLevel1(true))*.openGate(G1)]false &&
+[true*.openValve(V0).!(compareWaterLevel1(true))*.openGate(G1)]false &&
 
 %------------------------------------------------------------------- TRUE
 [true*.passSignalOn(S00).!(haltSignalOff(S00))]false &&
