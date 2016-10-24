@@ -229,15 +229,24 @@ GateSequence3 = g_sendToMaster(gateNoneReady).GateController;
 %---------------------------------------------------------------------------------------------------------------------------------
 %Signal Controller
 SignalController = (sum receive:M2S.s_recFromMaster(receive).(
-		(isSignalSetPass00(receive) == true) ->(haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S00).s_sendToMaster(signalReadyS00).SignalController) <> SignalController+
-		(isSignalSetPass01(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S01).s_sendToMaster(signalReadyS01).SignalController) <> SignalController+
-		(isSignalSetPass11(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S11).s_sendToMaster(signalReadyS11).SignalController) <> SignalController+
-		(isSignalSetPass10(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).passSignal(S10).s_sendToMaster(signalReadyS10).SignalController) <> SignalController+
-		(isSignalSetHaltAll(receive) == true) -> (haltSignal(S00).haltSignal(S01).haltSignal(S10).haltSignal(S11).s_sendToMaster(signalReadyHaltAll).SignalController) <> SignalController));
+		(isSignalSetPass00(receive) == true) ->(haltSignalS01.haltSignalS10.haltSignalS11.passSignalS00.s_sendToMaster(signalReadyS00).SignalController) <> SignalController+
+		(isSignalSetPass01(receive) == true) -> (haltSignalS00.haltSignalS10.haltSignalS11.passSignalS01.s_sendToMaster(signalReadyS01).SignalController) <> SignalController+
+		(isSignalSetPass11(receive) == true) -> (haltSignalS00.haltSignalS01.haltSignalS10.passSignalS11.s_sendToMaster(signalReadyS11).SignalController) <> SignalController+
+		(isSignalSetPass10(receive) == true) -> (haltSignalS00.haltSignalS01.haltSignalS11.passSignalS10.s_sendToMaster(signalReadyS10).SignalController) <> SignalController+
+		(isSignalSetHaltAll(receive) == true) -> (haltSignalS00.haltSignalS01.haltSignalS10.haltSignalS11.s_sendToMaster(signalReadyHaltAll).SignalController) <> SignalController));
 
+haltSignalS00 = haltSignalOn(S00).passSignalOff(S00);
+haltSignalS01 = haltSignalOn(S01).passSignalOff(S01);
+haltSignalS01 = haltSignalOn(S10).passSignalOff(S10);
+haltSignalS11 = haltSignalOn(S11).passSignalOff(S11);
 
+passSignalS00 = passSignalOn(S00).haltSignalOff(S00);
+passSignalS01 = passSignalOn(S01).haltSignalOff(S01);
+passSignalS10 = passSignalOn(S10).haltSignalOff(S10);
+passSignalS11 = passSignalOn(S11).haltSignalOff(S11);
 
-%haltSignalS00 = S00red_on.S00green_off;
+%halt = sum nr:SLID.
+%S00red_on.S00green_off;
 %passSignal00 = S00red_on
 %---------------------------------------------------------------------------------------------------------------------------------
 %ValveController
