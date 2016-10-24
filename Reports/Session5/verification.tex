@@ -34,6 +34,7 @@
 	\end{itemize}
 	
 \subsubsection{A gate can only open if the water level on both sides is equal}
+%TODO: Allow other actions before openGate, see mcf reqs
 \textit{It is only possible to send openGate(gateID$_i$) to open gate $i$ after \linebreak compareWaterlevel(containerID$_j$, $b$) delivers $b = true$ and no other action has been issued in the meantime, for gate $i$ and container $j$ are on the same side of the lift:}
 	\begin{itemize}
 		\item ~[true*.$\overline{\textrm{compareWaterlevel(containerID$_j$, true)}}$.openGate(gateID$_i$)]false
