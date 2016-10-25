@@ -24,17 +24,28 @@ Master controller keeps track of the position of the ship inside the system. Its
 	\centering
 	\begin{tabular}{lll}
 		\toprule
-		\textbf{Internal actions} & \textbf{Description} & \textbf{Parameter} \\
+		\textbf{Internal actions} & \textbf{Description} \\
 		\midrule
-		setSignalPass & Set given signal to pass & \{0, signalID\} \\
-		setWaterLevel & Set the waterlevel to given level & Level\\
-		setGateOpen & Open the given gate & \{0, gateID\} \\
-		signalReady & setSignalPass successful & None\\
-		signalError & setSignalPass not successful & None \\
-		gateReady & setGateOpen successful & None\\
-		gateError & setGateOpen not successful & None\\
-		waterLevelReady & setWaterLevel successful & None\\
-		waterLevelError & setWaterLevel not successful & None\\
+		setSignalPass00 & Set signal 00 to pass  \\
+		setSignalPass01 & Set signal 01 to pass  \\
+		setSignalPass10 & Set signal 10 to pass  \\
+		setSignalPass11 & Set signal 11 to pass  \\
+		setSignalHaltAll & Set all the signal light to Halt\\
+		signalReadyS00 & Signal controller reply to the setSignalPass00 request \\
+		signalReadyS01 & Signal controller reply to the setSignalPass01 request \\
+		signalReadyS10 & Signal controller reply to the setSignalPass10 request \\
+		signalReadyS11 & Signal controller reply to the setSignalPass11 request \\
+		signalReadyHaltAll & Signal controller reply to the setSignalHaltHall request \\
+		setWaterLevel0 & request for open the valve 0 \\
+		setWaterLevel1 & request for open the valve 1 \\
+		valveReady0 & Valve controller reply to a setWaterLevel0 request\\
+		valveReady1 & Valve controller reply to a setWaterLevel1 request\\
+		setGateOpen0 & request to open the gate 0\\
+		setGateOpen1 & request to open the gate 1\\
+		setGateOpenNone & request to close all gates\\
+		gateReady0 & gate controller reply to a setGateOpen0\\
+		gateReady1 & gate controller reply to a setGateOpen1\\
+		gateReadyNone & gate controller reply to a setGateOpenNone\\
 		\bottomrule
 	\end{tabular}%
 	\caption{Internal commands}
