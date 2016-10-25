@@ -14,12 +14,17 @@ This chapter identifies global requirements that the system should satisfy. Thes
 \end{enumerate}
 
 \subsubsection*{Functionality}
+\textit{Basic:}
+\begin{enumerate}
+	\item After a ship entered the system, this ship should be transported to the other level before any other ship is allowed to enter the system
+\end{enumerate}
+\textit{Serving Order:}
 \begin{enumerate}
 	\item If the system is in idle the first ship to arrive at a signal light should get served first
 	\item If the system is not in idle state, a ship is leaving the system and
 	\begin{enumerate}
 		\item there is no other boat waiting, the system should enter idle state
-		\item there are boats waiting on one side of the lift, the first boat in line gets served 
-		\item there are boats waiting on both sides of the lift, then the first boat on the current level gets served
+		\item there is a boat waiting on one side of the lift, it should be transported to the other side
+		\item there are boats waiting on both sides of the lift, then the boat on the current level should get served first
 	\end{enumerate}
 \end{enumerate}
