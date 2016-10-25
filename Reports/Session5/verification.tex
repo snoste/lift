@@ -1,5 +1,6 @@
 \section{System Verification}
-\subsection{Safety}
+The aim of this chapter is to verify the righteousness of the model by putting the translation of the requirements into mcf file code. This .mcf file is then run over the mCRL2 model and should return true for every requirement if it satisfies these requirements. The modal {\textmu}-calculus formulas are found below.
+\subsection{Formulas}
 \subsubsection{Only one gate can be open at a time}
 \textit{It is only possible to send an openGate(gateID$_i$) to open gate $i$ after gateState$_j$($ b $) delivers $b = false$ and openGate(gateID$_j$) has not been issued in the meantime, for gateID$_i \neq$ gateID$_j$:}
 	\begin{itemize}
@@ -73,6 +74,30 @@
 			passSignalOn(SignalID$_i$)]false
 		\end{flushright}
 
+\subsection{Verification steps}
+To verify if the mCRL2 model satisfies these requirements a series of steps need to be taken. First of all while running the mCRL2 GUI the model needs to be transformed into a linear process specification by doing a mcrl22lps transformation. Assuming the formulas are already put in a .mcf file the model should be then transformed using lps2pbes. Within the option menu of this transformation the .mcf file can then be added at formulas. After this transformation the requirements can then be verified by running pbes2bool.
+\subsection{Results}
+As the table below shows every evaluated requirement returns true indicating that the model of the boat lift system satisfies the requirements:
+
+\begin{table}[htbp]
+	\centering
+	\caption{Verification results}
+	\begin{tabular}{lp{10.5cm}l}
+		\toprule
+		\textbf{Requirement} &  \textbf{Result} \\
+		\hline
+		8.1.1&  True \\
+		8.1.2&  True \\
+		8.1.3&  True \\
+		8.1.4&  True \\
+		8.1.5&  True \\
+		8.1.6&  True \\
+		8.1.7&  True \\
+		8.1.8&  True \\
+		
+	\end{tabular}%
+	\label{tab:sort}%
+\end{table}%
 %--------------------------------------------------------------------------------------------------------------------------------------------%
 %																FUNCTIONALITY
 %--------------------------------------------------------------------------------------------------------------------------------------------%
