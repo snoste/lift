@@ -63,5 +63,8 @@
 [true*.closeGate(G1).!openGate(G1)*.passSignalOn(S10)]false &&
 %-------------------------------------------------------------------
 [true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S01)]false &&
-[true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S11)]false
+[true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S11)]false &&
+%-------------------------------------------------------------------
+<true*.goToPos01.!(goToPos11)*.boatExitUp>true &&
+<true*.goToPos11.!(goToPos01)*.boatExitDown>true
 

@@ -45,6 +45,15 @@
 		\end{itemize}
 	\item An entering signal can only indicate pass if there is no ship in the lift already
 		\begin{itemize}
-			\item It is only possible to send passSignalOn(signalID$_i$) to set the entering signal $i$ to pass after boatExitUp or boatExitDown and no neither goToPos00 nor goToPos10 have been issued in the meantime.\vspace{0.3cm}
+			\item It is only possible to send passSignalOn(signalID$_i$) to set the entering signal $i$ to pass after boatExitUp or boatExitDown and neither goToPos00 or goToPos10 have been issued in the meantime.\vspace{0.3cm}
 		\end{itemize}
+\end{enumerate}
+
+\subsubsection*{Functional}
+\begin{enumerate}
+	\item After a ship entered the system, this ship should be transported to the other level before any other ship is allowed to enter the system
+	\begin{itemize}
+		\item After a goToPos01 action, a boatExitUp should be issued after it, and not goToPos11 action between.
+		\item After a goToPos11 action, a boatExitDown should be issued after it, and not a goToPos01 action between.
+	\end{itemize}
 \end{enumerate}
