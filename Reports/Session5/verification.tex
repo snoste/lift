@@ -78,13 +78,14 @@ The aim of this chapter is to verify the righteousness of the model by putting t
 \textit{After a goToPos01 action, a boatExitUp should be issued after it, before a goToPos11 action}
 
 \begin{itemize}
-	\item $<$true*.goToPos01.$\overline{\textrm{goToPos11}}$*.boatExitUp$>$true
+	\item $[$true*.goToPos01]$<\overline{\textrm{goToPos11}}$*.boatExitUp$>$true
+
 \end{itemize}
 
 \textit{After a goToPos11 action, a boatExitDown should be issued after it, before a goToPos01 action.}
 
 \begin{itemize}
-	\item $<$true*.goToPos11.$\overline{\textrm{goToPos01}}$*.boatExitDown$>$true
+	\item $[$true*.goToPos11]$<\overline{\textrm{goToPos01}}$*.boatExitDown$>$true
 \end{itemize}
 
 \subsection{Verification steps}
