@@ -75,14 +75,14 @@ The aim of this chapter is to verify the righteousness of the model by putting t
 		\end{flushright}
 		
 \subsection{After a ship entered the system, this ship should be transported to the other level before any other ship is allowed to enter the system}
-\textit{After a goToPos01 action, a boatExitUp should be issued after it, before a goToPos11 action}
+\textit{After a goToPos01 action, a boatExitUp should be issued and not an goToPos11 action between.}
 
 \begin{itemize}
 	\item $[$true*.goToPos01]$<\overline{\textrm{goToPos11}}$*.boatExitUp$>$true
 
 \end{itemize}
 
-\textit{After a goToPos11 action, a boatExitDown should be issued after it, before a goToPos01 action.}
+\noindent\textit{After a goToPos11 action, a boatExitDown should be issued and not an goToPos01 action between.}
 
 \begin{itemize}
 	\item $[$true*.goToPos11]$<\overline{\textrm{goToPos01}}$*.boatExitDown$>$true
@@ -90,6 +90,7 @@ The aim of this chapter is to verify the righteousness of the model by putting t
 
 \subsection{Verification steps}
 To verify if the mCRL2 model satisfies these requirements a series of steps need to be taken. First of all while running the mCRL2 GUI the model needs to be transformed into a linear process specification by doing a mcrl22lps transformation. Assuming the formulas are already put in a .mcf file the model should be then transformed using lps2pbes. Within the option menu of this transformation the .mcf file can then be added at formulas. After this transformation the requirements can then be verified by running pbes2bool.
+\pagebreak
 \subsection{Results}
 As the table below shows every evaluated requirement returns true indicating that the model of the boat lift system satisfies the requirements:
 

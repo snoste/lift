@@ -2,7 +2,7 @@
 This section elaborates on the model that was programmed for the boat lift in mCRL2. The complete code can be found within Appendix A.
 \subsection{The code}
 The code has been divided into four controllers: one master controller and three sub controllers. Namely gate, valve and signal controller. The communication between each controller to the master and vice versa are clarified in Figure \ref{fig:subcontrollers}.
-There have been created a series of data types which can be seen in Table \ref{tab:sort}.
+Series of data types have been defined and used in the model which can be seen in Table \ref{tab:sort}.
 
 \begin{table}[htbp]
 	\centering
@@ -26,7 +26,7 @@ There have been created a series of data types which can be seen in Table \ref{t
 		\caption{Sorts/Data types of the model}
 	\label{tab:sors}%
 \end{table}%
-The master controller has control over the safety requirements and divides its into a series of states. Each states represents only one action and then it switches to the next state, checking the correctness of the previous state, or it creates a loop to a previous state. The loop can go back to idle or create a more complex loop depending on boats waiting to use the lift. This state forwarding mechanism allows the master controller to receive reliable information about the status of the systems from the other sub-controllers. The initial state of the boat lift is by definition idle state were the lift can expect no boat or no boat on either side.\\
+The master controller has control over the safety requirements and divides its into a series of states. Each states represents a action, or a series of a few very related actions, and then it switches to the next state, checking the correctness of the previous state, or it creates a loop to a previous state. The loop can go back to idle or create a more complex loop depending on boats waiting to use the lift. This state forwarding mechanism allows the master controller to receive reliable information about the status of the systems from the other sub-controllers. The initial state of the boat lift is by definition idle state were the lift can expect no boat or no boat on either side.\\
 During the writing of the mCRL2 code, the graph and the view tools were mostly used for analyzing as well as branching bisimulation. When looking at the view in Figure \ref{fig:view}, the system can be analyzed and explained efficiently. The model is mainly composed of two main branches that start from the idle state, they describe a boat going up the lift and a boat going down the lift. The system goes into one state at a time going down the branch. This method is effective to fulfill all requirement which will be checked and verified in the next Chapter. 
 
 \begin{figure}[!h]

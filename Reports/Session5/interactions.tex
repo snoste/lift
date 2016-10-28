@@ -1,10 +1,10 @@
 \section{Interactions}
-This chapter identifies interactions of the system in both commands and signals. These are necessary to model the system later in the mCRL2 standard. Apart from the Action or Signal name, also the parameters are displayed inside the tables:
+This chapter identifies interactions of the system in both commands and signals. These are necessary to model the system later in the mCRL2 standard. Apart from the action or signal names, the parameters are displayed inside the tables:
 
 \subsection{Commands}
 \begin{table}[htbp]
 	\centering
-	\begin{tabular}{lll}
+	\begin{tabular}{lp{7cm}l}
 		\toprule
 		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 		\midrule
@@ -12,12 +12,12 @@ This chapter identifies interactions of the system in both commands and signals.
 		closeGate & Close gate with the corresponding gate ID & GateID \\
 		openValve & Open valve with the corresponding gate ID & valveID \\
 		closeValve & Close valve with the corresponding gate ID & valveID \\
-		goToPos00  & simulation of a ship that is going to position 00 & $ \mathbb{B} $ \\
-		goToPos01  & simulation of a ship that is going to position 01 & $ \mathbb{B} $ \\
-		goToPos10  & simulation of a ship that is going to position 10 & $ \mathbb{B} $ \\
-		goToPos11  & simulation of a ship that is going to position 11 & $ \mathbb{B} $ \\
-		boatExitUp  & simulation of a ship that is exiting the system from the upper gate & $ \mathbb{B} $ \\
-		boatExitDown  & simulation of a ship that is exiting the system from the lower gate & $ \mathbb{B} $ \\
+		goToPos00  & Simulation of a ship that goes to position 00 & $ \mathbb{B} $ \\
+		goToPos01  & Simulation of a ship that goes to position 01 & $ \mathbb{B} $ \\
+		goToPos10  & Simulation of a ship that goes to position 10 & $ \mathbb{B} $ \\
+		goToPos11  & Simulation of a ship that goes to position 11 & $ \mathbb{B} $ \\
+		boatExitUp  & Simulation of a ship that exits the system from the upper gate & $ \mathbb{B} $ \\
+		boatExitDown  & Simulation of a ship that exits the system from the lower gate & $ \mathbb{B} $ \\
 		passSignalOn & Turn the given pass signal light on & SLID\\
 		passSignalOff & Turn the given pass signal light off & SLID\\
 		haltSignalOn & Turn the given halt signal light on & SLID\\
@@ -25,17 +25,19 @@ This chapter identifies interactions of the system in both commands and signals.
 		
 		\bottomrule
 	\end{tabular}%
-	\label{tab:addlabel}%
+
 	\caption{Commands are given by the controller to the lift components and the boat captain}
+		\label{tab:comd}%
 \end{table}%
 
 
 
-
 \subsection{Signals}
+
+The signaling actions used by the subcontrollers are listed in Table \ref{tab:action} and each of them will or can trigger commands which were listed in Table \ref{tab:comd}. The system component IDs are listed in Table \ref{tab:ids}. 
 \begin{table}[htbp]
 	\centering
-	\begin{tabular}{lp{6cm}l}
+	\begin{tabular}{lp{9cm}l}
 		\toprule
 		\textbf{Actions} & \textbf{Description} & \textbf{Parameter} \\
 		\hline
@@ -51,12 +53,12 @@ This chapter identifies interactions of the system in both commands and signals.
 		\bottomrule
 	\end{tabular}%
 	\caption{These signals are generated in the lift components and sent to the controller per request (or the request is in the form of signals being sent constantly)}
-	\label{tab:addlabel}%
+	\label{tab:action}%
 \end{table}%
 
 \begin{table}[htbp]
 	\centering
-	\begin{tabular}{lp{6cm}l}
+	\begin{tabular}{lll}
 		\toprule
 		\textbf{Parameter} & \textbf{Specification} & \textbf{Description} \\
 		\hline
@@ -74,10 +76,9 @@ This chapter identifies interactions of the system in both commands and signals.
 		PositionID   & Pnone &  identify no position\\
 		\bottomrule
 	\end{tabular}%
-	\caption{Parameter Data elements description)}
-	\label{tab:addlabel}%
+	\caption{Parameter Data elements description}
+	\label{tab:ids}%
 \end{table}%
-
 
 
 
