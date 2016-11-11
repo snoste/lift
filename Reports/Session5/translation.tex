@@ -34,10 +34,10 @@
 	
 	\item Signal lights can never be off nor indicate hold and pass at the same time
 		\begin{itemize}
-			\item passSignalOn(signalID$_i$) has to be followed directly by haltSignalOff(signalID$_i$)
-			\item haltSignalOn(signalID$_i$) has to be followed directly by passSignalOff(signalID$_i$).
-			\item passSignalOff(signalID$_i$) can only be issued directly after haltSignalOn(signalID$_i$).
-			\item haltSignalOff(signalID$_i$) can only be issued directly after passSignalOn(signalID$_i$).
+			\item passSignalOn(signalID$_i$) has to be followed directly by \\ haltSignalOff(signalID$_i$).
+			\item haltSignalOn(signalID$_i$) has to be followed directly by \\passSignalOff(signalID$_i$).
+			\item passSignalOff(signalID$_i$) can only be issued directly after \\haltSignalOn(signalID$_i$).
+			\item haltSignalOff(signalID$_i$) can only be issued directly after \\ passSignalOn(signalID$_i$).
 		\end{itemize}
 	\item Signal lights can only indicate pass if the gate is completely opened
 		\begin{itemize}

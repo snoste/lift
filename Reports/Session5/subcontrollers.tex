@@ -1,5 +1,5 @@
 \section{Sub controllers}
-This section will aim to derive sub controllers for the boat lift safety control system. The sub controllers communicate with each other and externally through the interactions and signals desribed in the previous section:
+This section aims to derive sub controllers for the boat lift safety control system. The sub controllers communicate with each other and externally through the interactions and signals desribed in the previous section:
 
 \begin{enumerate}
 	\item Master controller, controls the water flow and water level of the lift
@@ -16,7 +16,7 @@ This section will aim to derive sub controllers for the boat lift safety control
 	\label{fig:subcontrollers}
 \end{figure}
 \subsection{Master controller}
-The master controller keeps track of the position of the ship inside the system. Its responsible for coordinating the sequence of actions that are executed. These are either to set the gates, valves or signals. It gets confirmations or error signals back from the other sub controllers to either confirm or refute actions were carried out. \\
+The master controller keeps track of the position of the ship inside the system. Its responsible for coordinating the sequence of actions that are executed. These are either to set the gates, valves or signals. It recieves confirmations or error signals back from the other sub controllers to either confirm or refute actions were carried out. \\
 
 \noindent In Table \ref{tab:internal} a list of internal commands which the master controller uses to communicate with other sub controllers is displayed.
 
@@ -53,8 +53,8 @@ The master controller keeps track of the position of the ship inside the system.
 \end{table}%
 
 \subsection{Gate controller}
-The gate controller ensures the safety requirements are met. It gets a close or open command for the gates from the master controller. It sends a Gateready signal back to the master to confirm a gate has been safely opened or closed. 
+The gate controller ensures that all safety requirements are met. It gets a close or open command for the gates from the master controller. It sends a Gateready signal back to the master to confirm a gate has been safely opened or closed. It also makes sure that there is no ship between the doors before and whilst there doors are beeing closed.
 \subsection{Valve controller}
-The valve controller gets setWaterlevel command from the master controller to set the waterlevel to be equal to container x.1. It receives the valvestate to know if a valve is either open or closed. It executes the external actions openValve and closeValve to actually open or close a valve.  
+The valve controller gets setWaterlevel command from the master controller to set the waterlevel to be equal to container x.1. It receives the valvestate to know if a valve is either open or closed. It executes the external actions openValve and closeValve to actually open or close a valve.
 \subsection{Signal controller}
 The signal controller receives a SetSignalPass or SetSignalHaltAll from the master controller. It sends back that the signal has been set with Signalready or Signalerror when this was not accomplished. The signal subcontroller executes the external actions passSignalOn, passSignalOff, HaltSignalOn or HaltSignal off to set the signal lights. 
