@@ -79,13 +79,13 @@ The aim of this chapter is to verify the righteousness of the model by storing t
 \textit{After a goToPos01 action, a boatExitUp should be issued and not an goToPos11 action between.}
 
 \begin{itemize}
-	\item $[$true*.goToPos01].$\mu X([\overline{\textrm{boatExitUp}}].X~\wedge~ [goToPos11]false~\wedge <true>true)$
+	\item ~[true*.goToPos01.$\overline{\textrm{boatExitUp}}$*.(goToPos01 $\vee$ goToPos11)]false
 \end{itemize}
 
 \noindent\textit{After a goToPos11 action, a boatExitDown should be issued and not an goToPos01 action between.}
 
 \begin{itemize}
-	\item $[$true*.goToPos11].$\mu X([\overline{\textrm{boatExitDown}}].X~\wedge~ [goToPos01]false~\wedge <true>true)$
+	\item ~[true*.goToPos11.$\overline{\textrm{boatExitDown}}$*.(goToPos01 $\vee$ goToPos11)]false
 \end{itemize}
 
 \subsection{Verification steps}
