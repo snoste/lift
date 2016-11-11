@@ -65,5 +65,5 @@
 [true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S01)]false &&
 [true*.(goToPos00 || goToPos10).!(boatExitUp || boatExitDown)*.passSignalOn(S11)]false &&
 %-------------------------------------------------------------------
-[true*.goToPos01].uX([!boatExitUp].X && [goToPos11]false && <true>true)
-[true*.goToPos11].uX([!boatExitDown].X && [goToPos01]false && <true>true)
+[true*.goToPos01.!boatExitUp*.(goToPos01 || goToPos11)]false &&
+[true*.goToPos11.!boatExitDown*.(goToPos01 || goToPos11)]false
